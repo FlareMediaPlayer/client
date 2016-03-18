@@ -13,7 +13,7 @@ module.exports = function (grunt) {
                 //separator: ';'
             },
             dist: {
-                src: ['src/Intro.js' , 'src/*' , 'src/Core/*', 'src/Network/*','src/Outro.js'],
+                src: ['src/Intro.js' , 'src/Flare.js', 'src/**/*.js','src/Outro.js'],
                 dest: 'build/<%= pkg.name %>.<%= pkg.version %>.js'
             }
         },
