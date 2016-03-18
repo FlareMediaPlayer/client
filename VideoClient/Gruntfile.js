@@ -10,16 +10,17 @@ module.exports = function (grunt) {
         pkg: grunt.file.readJSON('package.json'),
         concat: {
             options: {
-                separator: ';'
+                //separator: ';'
             },
             dist: {
-                src: ['src/*.js'],
+                src: ['src/Intro.js' , 'src/*' , 'src/Core/*', 'src/Outro.js'],
                 dest: 'build/<%= pkg.name %>.js'
             }
         },
         uglify: {
             options: {
-                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
+
             },
             dist: {
                 files: {
