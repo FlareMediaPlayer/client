@@ -10,6 +10,7 @@ VideoPlayer.NetworkManager= function (videoPlayer) {
     return this;
     
     
+    
 };
 
 VideoPlayer.NetworkManager.prototype = {
