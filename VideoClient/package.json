@@ -1,14 +1,11 @@
 {
   "name": "VideoClient",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "keywords": [
-    "util",
-    "functional",
-    "server",
     "client",
     "browser"
   ],
-  "author": "mac",
+  "author": "OOP Team 2",
   "contributors": [],
   "dependencies": {},
   "devDependencies": {

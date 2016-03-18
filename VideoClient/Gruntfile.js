@@ -13,13 +13,13 @@ module.exports = function (grunt) {
                 //separator: ';'
             },
             dist: {
-                src: ['src/Intro.js' , 'src/*' , 'src/Core/*', 'src/Outro.js'],
+                src: ['src/Intro.js' , 'src/*' , 'src/Core/*', 'src/Network/*','src/Outro.js'],
                 dest: 'build/<%= pkg.name %>.js'
             }
         },
         uglify: {
             options: {
-                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
+                banner: '/*! <%= pkg.name %> Version:<%= pkg.version %> Built On: <%= grunt.template.today("yyyy-mm-dd") %> */\n'
 
             },
             dist: {
