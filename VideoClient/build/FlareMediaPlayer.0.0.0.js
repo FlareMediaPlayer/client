@@ -5,27 +5,10 @@
 
 
 
-    if (typeof exports !== 'undefined') {
-        if (typeof module !== 'undefined' && module.exports) {
-            exports = module.exports = VideoPlayer;
-        }
-        exports.VideoPlayer = VideoPlayer;
-    } else if (typeof define !== 'undefined' && define.amd) {
-        define('VideoPlayer', (function() { return root.VideoPlayer = VideoPlayer; })() );
-    } else {
-        root.VideoPlayer = VideoPlayer;
-    }
-
-    return VideoPlayer;
-    
-}).call(this);
-
-
-
 /**
- * @namespace Video Player
+ * @namespace Flare
  */
-var VideoPlayer = VideoPlayer || {
+var Flare = Flare || {
     /**
      * The Version Number
      * @constant
@@ -45,13 +28,29 @@ var VideoPlayer = VideoPlayer || {
 
 
 
-VideoPlayer.VideoPlayer = function () {
+    if (typeof exports !== 'undefined') {
+        if (typeof module !== 'undefined' && module.exports) {
+            exports = module.exports = Flare;
+        }
+        exports.Flare = Flare;
+    } else if (typeof define !== 'undefined' && define.amd) {
+        define('Flare', (function() { return root.Flare = Flare; })() );
+    } else {
+        root.Flare = Flare;
+    }
+
+    return Flare;
+    
+}).call(this);
+
+
+Flare.VideoPlayer = function () {
     
     /**
     * @property {number} id - video player id, for handling multiple VideoPlayer Objects
     * @readonly
     */
-    this.id = VideoPlayer.VIDEOS.push(this) - 1;
+    this.id = Flare.VIDEOS.push(this) - 1;
 
     //Filling out some basic properties we might need
     //DONT FORGET TO DO COMMENTS LATER
@@ -68,7 +67,7 @@ VideoPlayer.VideoPlayer = function () {
     return this;
 };
 
-VideoPlayer.VideoPlayer.prototype = {
+Flare.VideoPlayer.prototype = {
     boot: function () {
         
         if (this.isBooted)
@@ -76,14 +75,14 @@ VideoPlayer.VideoPlayer.prototype = {
             return;
         }
         
-        this._networkManager = new VideoPlayer.NetworkManager(this);
+        this._networkManager = new Flare.NetworkManager(this);
 
     }
 
 };
 
-VideoPlayer.VideoPlayer.prototype.constructor = VideoPlayer.VideoPlayer;
-VideoPlayer.Constants = {
+Flare.VideoPlayer.prototype.constructor = Flare.VideoPlayer;
+Flare.Constants = {
     //Put Constant values here
     
     //Examples:
@@ -93,22 +92,23 @@ VideoPlayer.Constants = {
 };
 
 
-VideoPlayer.NetworkManager= function (videoPlayer) {
+Flare.NetworkManager= function (videoPlayer) {
 
 
     /**
-    * @property {VideoPlayer.VideoPlayer} videoPlayer - A reference to the videoPlayer.
+    * @property Flare.VideoPlayer} videoPlayer - A reference to the videoPlayer.
     */
     this.videoPlayer = videoPlayer;
 
     return this;
     
     
+    
 };
 
-VideoPlayer.NetworkManager.prototype = {
+Flare.NetworkManager.prototype = {
 
 
 };
 
-VideoPlayer.NetworkManager.prototype.constructor = VideoPlayer.NetworkManager;
+Flare.NetworkManager.prototype.constructor = Flare.NetworkManager;

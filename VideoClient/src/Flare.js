@@ -1,8 +1,8 @@
 
 /**
- * @namespace Video Player
+ * @namespace Flare
  */
-var VideoPlayer = VideoPlayer || {
+var Flare = Flare || {
     /**
      * The Version Number
      * @constant

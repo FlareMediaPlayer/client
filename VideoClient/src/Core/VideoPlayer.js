@@ -1,11 +1,10 @@
-
-VideoPlayer.VideoPlayer = function () {
+Flare.VideoPlayer = function () {
     
     /**
     * @property {number} id - video player id, for handling multiple VideoPlayer Objects
     * @readonly
     */
-    this.id = VideoPlayer.VIDEOS.push(this) - 1;
+    this.id = Flare.VIDEOS.push(this) - 1;
 
     //Filling out some basic properties we might need
     //DONT FORGET TO DO COMMENTS LATER
@@ -22,7 +21,7 @@ VideoPlayer.VideoPlayer = function () {
     return this;
 };
 
-VideoPlayer.VideoPlayer.prototype = {
+Flare.VideoPlayer.prototype = {
     boot: function () {
         
         if (this.isBooted)
@@ -30,10 +29,10 @@ VideoPlayer.VideoPlayer.prototype = {
             return;
         }
         
-        this._networkManager = new VideoPlayer.NetworkManager(this);
+        this._networkManager = new Flare.NetworkManager(this);
 
     }
 
 };
 
-VideoPlayer.VideoPlayer.prototype.constructor = VideoPlayer.VideoPlayer;
+Flare.VideoPlayer.prototype.constructor = Flare.VideoPlayer;

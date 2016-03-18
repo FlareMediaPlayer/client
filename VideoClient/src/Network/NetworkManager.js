@@ -1,9 +1,9 @@
 
-VideoPlayer.NetworkManager= function (videoPlayer) {
+Flare.NetworkManager= function (videoPlayer) {
 
 
     /**
-    * @property {VideoPlayer.VideoPlayer} videoPlayer - A reference to the videoPlayer.
+    * @property Flare.VideoPlayer} videoPlayer - A reference to the videoPlayer.
     */
     this.videoPlayer = videoPlayer;
 
@@ -13,9 +13,9 @@ VideoPlayer.NetworkManager= function (videoPlayer) {
     
 };
 
-VideoPlayer.NetworkManager.prototype = {
+Flare.NetworkManager.prototype = {
 
 
 };
 
-VideoPlayer.NetworkManager.prototype.constructor = VideoPlayer.NetworkManager;
+Flare.NetworkManager.prototype.constructor = Flare.NetworkManager;

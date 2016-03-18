@@ -1,4 +1,4 @@
-VideoPlayer.Constants = {
+Flare.Constants = {
     //Put Constant values here
     
     //Examples:
