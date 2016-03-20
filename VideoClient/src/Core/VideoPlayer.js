@@ -44,7 +44,10 @@ Flare.VideoPlayer.prototype = {
         this._networkManager = new Flare.NetworkManager(this);
         this.canvas = new Flare.Canvas(this);
         this.canvas.addToDOM();
-
+        
+        
+        //Testing, trying to send some data
+       // this._networkManager.send("hello");
 
     }
 

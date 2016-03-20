@@ -1,8 +1,19 @@
-Flare.Constants = {
+Flare.CONSTANTS = {
     //Put Constant values here
-    
-    //Examples:
-    REQUEST_CONNECT : 100,
-    RESPONSE_CONNECT : 200
+
+    NETWORK:{
+        
+        REQUEST:{
+            
+            CONNECT: 100
+            
+        },
+        
+        RESPONSE:{
+        
+        }
+                
+    }
+
 
 };

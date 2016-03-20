@@ -25,6 +25,26 @@ var Flare = Flare || {
 };
 
 
+Flare.CONSTANTS = {
+    //Put Constant values here
+
+    NETWORK:{
+        
+        REQUEST:{
+            
+            CONNECT: 100
+            
+        },
+        
+        RESPONSE:{
+        
+        }
+                
+    }
+
+
+};
+
 
 Flare.AudioEngine= function (videoPlayer) {
 
@@ -200,45 +220,92 @@ Flare.VideoPlayer.prototype = {
         this._networkManager = new Flare.NetworkManager(this);
         this.canvas = new Flare.Canvas(this);
         this.canvas.addToDOM();
-
+        
+        
+        //Testing, trying to send some data
+       // this._networkManager.send("hello");
 
     }
 
 };
 
 Flare.VideoPlayer.prototype.constructor = Flare.VideoPlayer;
-Flare.Constants = {
-    //Put Constant values here
-    
-    //Examples:
-    REQUEST_CONNECT : 100,
-    RESPONSE_CONNECT : 200
 
-};
-
-
-Flare.NetworkManager= function (videoPlayer) {
+Flare.NetworkManager = function (videoPlayer) {
 
 
     /**
-    * @property Flare.VideoPlayer} videoPlayer - A reference to the videoPlayer.
-    */
+     * @property Flare.VideoPlayer} videoPlayer - A reference to the videoPlayer.
+     */
     this.videoPlayer = videoPlayer;
+    this.socket;
     
-    this.socket = new WebSocket('ws://localhost:6661' );
-
+    this.connected = false;
+    
+    this.callbacks = {};
+    
+    this.connect();
+    this.setup();
+    
+    
     return this;
-    
-    
-    
+
+
+
 };
 
 Flare.NetworkManager.prototype = {
+    
+    connect: function(){
+        
+        this.socket = new WebSocket('ws://localhost:6661');
+    },
+    
+    close: function(){
+        
+        this.socket.close();
+    },
+    
+    setup: function () {
 
+        this.socket.onopen = this.onOpen;
+        this.socket.onclose = this.onClose;
+        this.socket.onmessage = this.onMessage;
+        this.socket.onerror = this.onError;
 
+        
+    },
+    
+    onOpen: function(){
+        
+        console.log("connection Opened");
+
+    },
+    
+    onClose: function(){
+        console.log("closed");
+    },
+    
+    onMessage: function(message){
+        console.log(message);
+    },
+    
+    onError: function(e){
+        console.log(e);
+    },
+    
+    send:function(data){
+        
+        this.socket.send(data);
+        
+    }
+    
 };
 
 Flare.NetworkManager.prototype.constructor = Flare.NetworkManager;
+
+Flare.NETWORK_PROTOCOL_TABLE = {};
+Flare.NETWORK_PROTOCOL_TABLE[Flare.CONSTANTS.NETWORK.REQUEST.CONNECT] = "Connect";
     if (typeof exports !== 'undefined') {
         if (typeof module !== 'undefined' && module.exports) {
             exports = module.exports = Flare;
