@@ -268,10 +268,10 @@ Flare.NetworkManager.prototype = {
     
     setup: function () {
 
-        this.socket.onopen = this.onOpen;
-        this.socket.onclose = this.onClose;
-        this.socket.onmessage = this.onMessage;
-        this.socket.onerror = this.onError;
+        this.socket.onopen = this.onOpen.bind(this);
+        this.socket.onclose = this.onClose.bind(this);
+        this.socket.onmessage = this.onMessage.bind(this);
+        this.socket.onerror = this.onError.bind(this);
 
         
     },
@@ -279,6 +279,7 @@ Flare.NetworkManager.prototype = {
     onOpen: function(){
         
         console.log("connection Opened");
+        this.socket.send("hello");
 
     },
     
