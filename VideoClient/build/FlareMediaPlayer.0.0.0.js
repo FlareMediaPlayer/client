@@ -288,7 +288,7 @@ Flare.NetworkManager.prototype = {
     },
     
     onMessage: function(message){
-        console.log(message);
+        console.log(message.data);
     },
     
     onError: function(e){
