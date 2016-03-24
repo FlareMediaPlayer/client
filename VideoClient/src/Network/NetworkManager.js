@@ -1,11 +1,11 @@
 
-Flare.NetworkManager = function (videoPlayer) {
+Flare.NetworkManager = function (mediaPlayer) {
 
 
     /**
-     * @property Flare.VideoPlayer} videoPlayer - A reference to the videoPlayer.
+     * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
      */
-    this.videoPlayer = videoPlayer;
+    this.mediaPlayer = mediaPlayer;
     this.socket;
     
     this.connected = false;

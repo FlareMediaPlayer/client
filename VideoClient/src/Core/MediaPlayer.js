@@ -1,10 +1,10 @@
-Flare.VideoPlayer = function (parent) {
+Flare.MediaPlayer = function (options) {
 
     /**
-     * @property {number} id - video player id, for handling multiple VideoPlayer Objects
+     * @property {number} id - video player id, for handling multiple MediaPlayer Objects
      * @readonly
      */
-    this.id = Flare.VIDEOS.push(this) - 1;
+    this.id = Flare.PLAYERS.push(this) - 1;
 
     this.parent = "parent";
 
@@ -17,7 +17,9 @@ Flare.VideoPlayer = function (parent) {
     this.frameWidth = null;
     this.frameHeight = null;
     this._networkManager = null; //Not sure if public or private yet
+    this._forceUpdate;
     this.isBooted = null;
+    this.oscillator = null;
 
     /**
      * @property {Flare.Device} Reference to global device object
@@ -26,13 +28,13 @@ Flare.VideoPlayer = function (parent) {
 
     //You have to wait for the device to be ready
     this.device.whenReady(this.boot, this);
-    
+
     console.log('Flare Media Player BETA  www.flaremediaplayer.com');
 
     return this;
 };
 
-Flare.VideoPlayer.prototype = {
+Flare.MediaPlayer.prototype = {
     
     boot: function () {
 
@@ -41,16 +43,27 @@ Flare.VideoPlayer.prototype = {
             return;
         }
 
+        this._forceUpdate = true;
+
+        //Initialize System
+        this.oscillator = new Flare.Oscillator(this);
         this._networkManager = new Flare.NetworkManager(this);
         this.canvas = new Flare.Canvas(this);
         this.canvas.addToDOM();
+
+
+        //Okay now start the oscillator
+        this.oscillator.run();
+
+    },
+    
+    update: function (time) {
+  
+        document.getElementById("test").innerHTML = time % 60;
+            
         
-        
-        //Testing, trying to send some data
-       // this._networkManager.send("hello");
 
     }
-
 };
 
-Flare.VideoPlayer.prototype.constructor = Flare.VideoPlayer;
+Flare.MediaPlayer.prototype.constructor = Flare.MediaPlayer;

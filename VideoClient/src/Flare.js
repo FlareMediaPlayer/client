@@ -16,7 +16,7 @@ var Flare = Flare || {
      * @constant
      * @type {array}
      */
-    VIDEOS: []
+    PLAYERS: []
     
 };
 

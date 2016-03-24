@@ -20,7 +20,7 @@ var Flare = Flare || {
      * @constant
      * @type {array}
      */
-    VIDEOS: []
+    PLAYERS: []
     
 };
 
@@ -46,13 +46,13 @@ Flare.CONSTANTS = {
 };
 
 
-Flare.AudioEngine= function (videoPlayer) {
+Flare.AudioEngine= function (mediaPlayer) {
 
 
     /**
-    * @property Flare.VideoPlayer} videoPlayer - A reference to the videoPlayer.
+    * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
     */
-    this.videoPlayer = videoPlayer;
+    this.mediaPlayer = mediaPlayer;
 
     return this;
     
@@ -67,13 +67,13 @@ Flare.AudioEngine.prototype = {
 
 Flare.AudioEngine.prototype.constructor = Flare.AudioEngine;
 
-Flare.Buffer= function (videoPlayer) {
+Flare.Buffer= function (mediaPlayer) {
 
 
     /**
-    * @property Flare.VideoPlayer} videoPlayer - A reference to the videoPlayer.
+    * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
     */
-    this.videoPlayer = videoPlayer;
+    this.mediaPlayer = mediaPlayer;
 
     return this;
     
@@ -88,18 +88,18 @@ Flare.Buffer.prototype = {
 
 Flare.Buffer.prototype.constructor = Flare.Buffer;
 
-Flare.Canvas = function (videoPlayer) {
+Flare.Canvas = function (mediaPlayer) {
 
     /**
-     * @property Flare.VideoPlayer} videoPlayer - A reference to the videoPlayer.
+     * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
      */
-    this.videoPlayer = videoPlayer;
+    this.mediaPlayer = mediaPlayer;
 
 
     //Private canvas element
     this.canvas = document.createElement('canvas');
 
-    this.canvas.id = videoPlayer.id;
+    this.canvas.id = mediaPlayer.id;
 
     //for now hard code
     this.canvas.width = 256;
@@ -119,7 +119,7 @@ Flare.Canvas.prototype = {
     addToDOM: function () {
 
         var target;
-        var parent = this.videoPlayer.parent;
+        var parent = this.mediaPlayer.parent;
 
         
         if (parent)
@@ -153,14 +153,83 @@ Flare.Canvas.prototype = {
 };
 
 Flare.Canvas.prototype.constructor = Flare.Canvas;
+Flare.MediaPlayer = function (options) {
 
-Flare.VideoEngine= function (videoPlayer) {
+    /**
+     * @property {number} id - video player id, for handling multiple MediaPlayer Objects
+     * @readonly
+     */
+    this.id = Flare.PLAYERS.push(this) - 1;
+
+    this.parent = "parent";
+
+    //Filling out some basic properties we might need
+    //DONT FORGET TO DO COMMENTS LATER
+
+
+
+    this.url = null;
+    this.frameWidth = null;
+    this.frameHeight = null;
+    this._networkManager = null; //Not sure if public or private yet
+    this._forceUpdate;
+    this.isBooted = null;
+    this.oscillator = null;
+
+    /**
+     * @property {Flare.Device} Reference to global device object
+     */
+    this.device = Flare.Device;
+
+    //You have to wait for the device to be ready
+    this.device.whenReady(this.boot, this);
+
+    console.log('Flare Media Player BETA  www.flaremediaplayer.com');
+
+    return this;
+};
+
+Flare.MediaPlayer.prototype = {
+    
+    boot: function () {
+
+        if (this.isBooted)
+        {
+            return;
+        }
+
+        this._forceUpdate = true;
+
+        //Initialize System
+        this.oscillator = new Flare.Oscillator(this);
+        this._networkManager = new Flare.NetworkManager(this);
+        this.canvas = new Flare.Canvas(this);
+        this.canvas.addToDOM();
+
+
+        //Okay now start the oscillator
+        this.oscillator.run();
+
+    },
+    
+    update: function (time) {
+  
+        document.getElementById("test").innerHTML = time % 60;
+            
+        
+
+    }
+};
+
+Flare.MediaPlayer.prototype.constructor = Flare.MediaPlayer;
+
+Flare.VideoEngine= function (mediaPlayer) {
 
 
     /**
-    * @property Flare.VideoPlayer} videoPlayer - A reference to the videoPlayer.
+    * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
     */
-    this.videoPlayer = videoPlayer;
+    this.mediaPlayer = mediaPlayer;
 
     return this;
     
@@ -174,70 +243,14 @@ Flare.VideoEngine.prototype = {
 };
 
 Flare.VideoEngine.prototype.constructor = Flare.VideoEngine;
-Flare.VideoPlayer = function (parent) {
 
-    /**
-     * @property {number} id - video player id, for handling multiple VideoPlayer Objects
-     * @readonly
-     */
-    this.id = Flare.VIDEOS.push(this) - 1;
-
-    this.parent = "parent";
-
-    //Filling out some basic properties we might need
-    //DONT FORGET TO DO COMMENTS LATER
-
-
-
-    this.url = null;
-    this.frameWidth = null;
-    this.frameHeight = null;
-    this._networkManager = null; //Not sure if public or private yet
-    this.isBooted = null;
-
-    /**
-     * @property {Flare.Device} Reference to global device object
-     */
-    this.device = Flare.Device;
-
-    //You have to wait for the device to be ready
-    this.device.whenReady(this.boot, this);
-    
-    console.log('Flare Media Player BETA  www.flaremediaplayer.com');
-
-    return this;
-};
-
-Flare.VideoPlayer.prototype = {
-    
-    boot: function () {
-
-        if (this.isBooted)
-        {
-            return;
-        }
-
-        this._networkManager = new Flare.NetworkManager(this);
-        this.canvas = new Flare.Canvas(this);
-        this.canvas.addToDOM();
-        
-        
-        //Testing, trying to send some data
-       // this._networkManager.send("hello");
-
-    }
-
-};
-
-Flare.VideoPlayer.prototype.constructor = Flare.VideoPlayer;
-
-Flare.NetworkManager = function (videoPlayer) {
+Flare.NetworkManager = function (mediaPlayer) {
 
 
     /**
-     * @property Flare.VideoPlayer} videoPlayer - A reference to the videoPlayer.
+     * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
      */
-    this.videoPlayer = videoPlayer;
+    this.mediaPlayer = mediaPlayer;
     this.socket;
     
     this.connected = false;
@@ -321,6 +334,114 @@ Flare.NETWORK_PROTOCOL_TABLE[Flare.CONSTANTS.NETWORK.REQUEST.CONNECT] = "Connect
     return Flare;
     
 }).call(this);
+
+/**
+ * Class to handle the internal clock time and do adjustments depending on how fast the browser handles the updates
+ * @param {type} mediaPlayer
+ * @returns {Flare.Oscillator}
+ */
+Flare.Oscillator = function (mediaPlayer) {
+
+
+    /**
+     * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
+     */
+    this.mediaPlayer = mediaPlayer;
+
+
+    
+    return this;
+
+
+};
+
+Flare.Oscillator.prototype = {
+  
+};
+
+Flare.Oscillator.prototype.constructor = Flare.Oscillator;
+
+
+//This thing handles making the browser do loops
+Flare.Oscillator = function (mediaPlayer) {
+
+
+    /**
+     * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
+     */
+    this.mediaPlayer = mediaPlayer;
+
+    this.running = false;
+
+    this._loopFunction = null;
+    
+    this.fps = 30; // Testing for now
+    
+    this.updateSpeed = 0;
+    
+    this.usingSetTimeOut = false;
+    this.usingRequestAnimationFrame = false;
+    
+    return this;
+
+
+};
+
+Flare.Oscillator.prototype = {
+    
+    run: function(){
+        
+        this.running = true;
+        var _this = this;
+        this.updateSpeed = Math.floor(1000/this.fps);
+        
+        //if window.requestAnimationFrame is not available, use setTimeout
+        if (!window.requestAnimationFrame){
+            
+            this.usingSetTimeOut = true;
+
+            this._loopFunction = function () {
+                return _this.updateSetTimeout();
+            };
+            
+            window.setTimeout(this._loopFunction, 0);
+
+           
+            
+        }else{
+            
+            this.usingRequestAnimationFrame = true;
+
+            this._loopFunction = function (time) {
+                return _this.updateRequestAnimationFrame(time);
+            };
+            
+            window.requestAnimationFrame(this._loopFunction);
+
+ 
+        }
+        
+    },
+    
+    updateRequestAnimationFrame: function(time){
+        
+        this.mediaPlayer.update(Math.floor(time));
+
+        window.requestAnimationFrame(this._loopFunction);
+        
+    },
+    
+    updateSetTimeout: function(){
+        
+        this.mediaPlayer.update(Date.now());
+        
+        window.setTimeout(this._loopFunction, this.updateSpeed);
+        
+    }
+    
+};
+
+Flare.Oscillator.prototype.constructor = Flare.Oscillator;
 
 Flare.Device = function () {
 

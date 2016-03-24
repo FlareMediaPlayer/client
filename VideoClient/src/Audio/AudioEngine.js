@@ -1,11 +1,11 @@
 
-Flare.AudioEngine= function (videoPlayer) {
+Flare.AudioEngine= function (mediaPlayer) {
 
 
     /**
-    * @property Flare.VideoPlayer} videoPlayer - A reference to the videoPlayer.
+    * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
     */
-    this.videoPlayer = videoPlayer;
+    this.mediaPlayer = mediaPlayer;
 
     return this;
     

@@ -1,16 +1,16 @@
 
-Flare.Canvas = function (videoPlayer) {
+Flare.Canvas = function (mediaPlayer) {
 
     /**
-     * @property Flare.VideoPlayer} videoPlayer - A reference to the videoPlayer.
+     * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
      */
-    this.videoPlayer = videoPlayer;
+    this.mediaPlayer = mediaPlayer;
 
 
     //Private canvas element
     this.canvas = document.createElement('canvas');
 
-    this.canvas.id = videoPlayer.id;
+    this.canvas.id = mediaPlayer.id;
 
     //for now hard code
     this.canvas.width = 256;
@@ -30,7 +30,7 @@ Flare.Canvas.prototype = {
     addToDOM: function () {
 
         var target;
-        var parent = this.videoPlayer.parent;
+        var parent = this.mediaPlayer.parent;
 
         
         if (parent)
