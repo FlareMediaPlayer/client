@@ -13,6 +13,8 @@ Flare.Oscillator = function (mediaPlayer) {
 
     this._loopFunction = null;
     
+    this._eventId = null;
+    
     this.fps = 30; // Testing for now
     
     this.updateSpeed = 0;
@@ -42,7 +44,7 @@ Flare.Oscillator.prototype = {
                 return _this.updateSetTimeout();
             };
             
-            window.setTimeout(this._loopFunction, 0);
+            this._eventId = window.setTimeout(this._loopFunction, 0);
 
            
             
@@ -54,10 +56,25 @@ Flare.Oscillator.prototype = {
                 return _this.updateRequestAnimationFrame(time);
             };
             
-            window.requestAnimationFrame(this._loopFunction);
+            this._eventId =  window.requestAnimationFrame(this._loopFunction);
 
  
         }
+        
+    },
+    
+    stop: function(){
+        
+        if(this.usingSetTimeOut){
+            
+            clearTimeout(this._eventId);
+            
+        }else{
+            
+            window.cancelAnimationFrame(this._eventId);
+        }
+        
+        this.running = false;
         
     },
     
@@ -65,7 +82,7 @@ Flare.Oscillator.prototype = {
         
         this.mediaPlayer.update(Math.floor(time));
 
-        window.requestAnimationFrame(this._loopFunction);
+        this._eventId = window.requestAnimationFrame(this._loopFunction);
         
     },
     
@@ -73,7 +90,7 @@ Flare.Oscillator.prototype = {
         
         this.mediaPlayer.update(Date.now());
         
-        window.setTimeout(this._loopFunction, this.updateSpeed);
+        this._eventId = window.setTimeout(this._loopFunction, this.updateSpeed);
         
     }
     

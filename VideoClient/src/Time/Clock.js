@@ -2,9 +2,9 @@
 /**
  * Class to handle the internal clock time and do adjustments depending on how fast the browser handles the updates
  * @param {type} mediaPlayer
- * @returns {Flare.Oscillator}
+ * @returns {Flare.Clock}
  */
-Flare.Oscillator = function (mediaPlayer) {
+Flare.Clock = function (mediaPlayer) {
 
 
     /**
@@ -12,11 +12,19 @@ Flare.Oscillator = function (mediaPlayer) {
      */
     this.mediaPlayer = mediaPlayer;
     
+    this._timeInitialized = 0;
+    
     this.elapsed = 0;
+    
+    this.elapsedMs = 0;
     
     this.previousTime = 0;
 
     this.currentTime = 0;
+    
+    this.timeUpdated = 0;
+    
+    this.lastTimeUpdated = 0;
 
     
     return this;
@@ -24,15 +32,44 @@ Flare.Oscillator = function (mediaPlayer) {
 
 };
 
-Flare.Oscillator.prototype = {
+Flare.Clock.prototype = {
+    boot: function(){
+        this._timeInitialized = Date.now();
+        this.timeUpdated = Date.now();
+    },
+    
+    
+    refresh: function () {
+
+        //  Set to the old Date.now value
+        this.lastTimeUpdated = this.timeUpdated;
+
+        // this.time always holds a Date.now value
+        this.timeUpdated = Date.now();
+
+        //  Adjust accordingly.
+        this.elapsedMs = this.timeUpdated - this.lastTimeUpdated;
+
+    },
     
     update: function(time){
+       
+       
+        this.lastTimeUpdated = this.timeUpdated;
+
+        // this.time always holds a Date.now value
+        this.timeUpdated = Date.now();
+
+        this.elapsedMS = this.timeUpdated - this.lastTimeUpdated;
+
+        this.previousTime = this.currentTime;
         
-        //Finish figureout out the elapsed time here
         this.currentTime = time;
+
+        this.elapsed = this.currentTime - this.previousTime;
         
     }
   
 };
 
-Flare.Oscillator.prototype.constructor = Flare.Oscillator;
+Flare.Clock.prototype.constructor = Flare.Clock;

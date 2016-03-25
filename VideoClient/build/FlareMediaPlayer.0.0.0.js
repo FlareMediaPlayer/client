@@ -98,12 +98,13 @@ Flare.Canvas = function (mediaPlayer) {
 
     //Private canvas element
     this.canvas = document.createElement('canvas');
+    this.ctx = this.canvas.getContext("2d");
 
     this.canvas.id = mediaPlayer.id;
 
     //for now hard code
-    this.canvas.width = 256;
-    this.canvas.height = 256;
+    this.canvas.width = 960;
+    this.canvas.height = 540;
     
     this.canvas.style.display = 'block';
     this.canvas.style.backgroundColor = 'black';
@@ -144,7 +145,7 @@ Flare.Canvas.prototype = {
     },
     
     render: function(frame){
-        
+        this.ctx.drawImage(frame, 0 ,0);
         //RENDER LOGIC GOES HERE
         //THE ARGUMENT IS THE FULLY RENDERED FRAME, JUST NEED TO PAINT TO THE CANVAS
         
@@ -175,7 +176,10 @@ Flare.MediaPlayer = function (options) {
     this._forceUpdate;
     this.isBooted = null;
     this.oscillator = null;
-
+    
+    this.testCounter = 0;
+    
+    
     /**
      * @property {Flare.Device} Reference to global device object
      */
@@ -202,23 +206,52 @@ Flare.MediaPlayer.prototype = {
 
         //Initialize System
         this.oscillator = new Flare.Oscillator(this);
+        this.clock = new Flare.Clock(this);
         this._networkManager = new Flare.NetworkManager(this);
         this.canvas = new Flare.Canvas(this);
         this.canvas.addToDOM();
 
 
+        //FOR TESTING ONLY
+        this.frames = [152];
+        var fileNum;
+        for(var f = 0 ; f< 152; f++){
+            this.frames[f] = new Image(960,540);
+            if(f  < 10 ) {
+                fileNum = "00" + f;
+            }else if (f < 100){
+                fileNum = "0" + f;
+            }else{
+                fileNum = f;
+            }
+            this.frames[f].src = './testVideo/frame' + fileNum + '.jpg';
+        }
+        //END TESTING
+        
+        
         //Okay now start the oscillator
+        this.clock.boot();
         this.oscillator.run();
+        
+        
 
     },
     
     update: function (time) {
-  
-        document.getElementById("test").innerHTML = time % 60;
+        this.clock.update(time);
+        
+        
             
         
 
+        //Finished with update, render the frame:
+        //TESTING ONLY
+        
+        this.canvas.render(this.frames[this.testCounter%152]);
+        this.testCounter++;
     }
+    
+  
 };
 
 Flare.MediaPlayer.prototype.constructor = Flare.MediaPlayer;
@@ -338,16 +371,29 @@ Flare.NETWORK_PROTOCOL_TABLE[Flare.CONSTANTS.NETWORK.REQUEST.CONNECT] = "Connect
 /**
  * Class to handle the internal clock time and do adjustments depending on how fast the browser handles the updates
  * @param {type} mediaPlayer
- * @returns {Flare.Oscillator}
+ * @returns {Flare.Clock}
  */
-Flare.Oscillator = function (mediaPlayer) {
+Flare.Clock = function (mediaPlayer) {
 
 
     /**
      * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
      */
     this.mediaPlayer = mediaPlayer;
+    
+    this._timeInitialized = 0;
+    
+    this.elapsed = 0;
+    
+    this.elapsedMs = 0;
+    
+    this.previousTime = 0;
 
+    this.currentTime = 0;
+    
+    this.timeUpdated = 0;
+    
+    this.lastTimeUpdated = 0;
 
     
     return this;
@@ -355,11 +401,47 @@ Flare.Oscillator = function (mediaPlayer) {
 
 };
 
-Flare.Oscillator.prototype = {
+Flare.Clock.prototype = {
+    boot: function(){
+        this._timeInitialized = Date.now();
+        this.timeUpdated = Date.now();
+    },
+    
+    
+    refresh: function () {
+
+        //  Set to the old Date.now value
+        this.lastTimeUpdated = this.timeUpdated;
+
+        // this.time always holds a Date.now value
+        this.timeUpdated = Date.now();
+
+        //  Adjust accordingly.
+        this.elapsedMs = this.timeUpdated - this.lastTimeUpdated;
+
+    },
+    
+    update: function(time){
+       
+       
+        this.lastTimeUpdated = this.timeUpdated;
+
+        // this.time always holds a Date.now value
+        this.timeUpdated = Date.now();
+
+        this.elapsedMS = this.timeUpdated - this.lastTimeUpdated;
+
+        this.previousTime = this.currentTime;
+        
+        this.currentTime = time;
+
+        this.elapsed = this.currentTime - this.previousTime;
+        
+    }
   
 };
 
-Flare.Oscillator.prototype.constructor = Flare.Oscillator;
+Flare.Clock.prototype.constructor = Flare.Clock;
 
 
 //This thing handles making the browser do loops
@@ -374,6 +456,8 @@ Flare.Oscillator = function (mediaPlayer) {
     this.running = false;
 
     this._loopFunction = null;
+    
+    this._eventId = null;
     
     this.fps = 30; // Testing for now
     
@@ -404,7 +488,7 @@ Flare.Oscillator.prototype = {
                 return _this.updateSetTimeout();
             };
             
-            window.setTimeout(this._loopFunction, 0);
+            this._eventId = window.setTimeout(this._loopFunction, 0);
 
            
             
@@ -416,10 +500,25 @@ Flare.Oscillator.prototype = {
                 return _this.updateRequestAnimationFrame(time);
             };
             
-            window.requestAnimationFrame(this._loopFunction);
+            this._eventId =  window.requestAnimationFrame(this._loopFunction);
 
  
         }
+        
+    },
+    
+    stop: function(){
+        
+        if(this.usingSetTimeOut){
+            
+            clearTimeout(this._eventId);
+            
+        }else{
+            
+            window.cancelAnimationFrame(this._eventId);
+        }
+        
+        this.running = false;
         
     },
     
@@ -427,7 +526,7 @@ Flare.Oscillator.prototype = {
         
         this.mediaPlayer.update(Math.floor(time));
 
-        window.requestAnimationFrame(this._loopFunction);
+        this._eventId = window.requestAnimationFrame(this._loopFunction);
         
     },
     
@@ -435,7 +534,7 @@ Flare.Oscillator.prototype = {
         
         this.mediaPlayer.update(Date.now());
         
-        window.setTimeout(this._loopFunction, this.updateSpeed);
+        this._eventId = window.setTimeout(this._loopFunction, this.updateSpeed);
         
     }
     

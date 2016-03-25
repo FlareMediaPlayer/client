@@ -9,12 +9,13 @@ Flare.Canvas = function (mediaPlayer) {
 
     //Private canvas element
     this.canvas = document.createElement('canvas');
+    this.ctx = this.canvas.getContext("2d");
 
     this.canvas.id = mediaPlayer.id;
 
     //for now hard code
-    this.canvas.width = 256;
-    this.canvas.height = 256;
+    this.canvas.width = 960;
+    this.canvas.height = 540;
     
     this.canvas.style.display = 'block';
     this.canvas.style.backgroundColor = 'black';
@@ -55,7 +56,7 @@ Flare.Canvas.prototype = {
     },
     
     render: function(frame){
-        
+        this.ctx.drawImage(frame, 0 ,0);
         //RENDER LOGIC GOES HERE
         //THE ARGUMENT IS THE FULLY RENDERED FRAME, JUST NEED TO PAINT TO THE CANVAS
         
