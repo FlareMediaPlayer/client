@@ -27,19 +27,15 @@ var Flare = Flare || {
 
 Flare.CONSTANTS = {
     //Put Constant values here
-
-    NETWORK:{
-        
-        REQUEST:{
-            
-            CONNECT: 100
-            
-        },
-        
-        RESPONSE:{
-        
-        }
-                
+    VIDEO_SIZE:{
+        ORIGINAL: 0,
+        FIXED: 1,
+        RESPONSIVE: 2
+    },
+    
+    VIDEO_SCALE_MODE : {
+        MAINTAIN_ASPECT: 0,
+        FILL: 1
     }
 
 
@@ -154,13 +150,27 @@ Flare.Canvas.prototype = {
 };
 
 Flare.Canvas.prototype.constructor = Flare.Canvas;
-Flare.MediaPlayer = function (options) {
+Flare.MediaPlayer = function (userOptions) {
 
     /**
      * @property {number} id - video player id, for handling multiple MediaPlayer Objects
      * @readonly
      */
     this.id = Flare.PLAYERS.push(this) - 1;
+    
+    
+    this.options = {
+        
+        container : '',
+        videoPath: '',
+        videoSize : Flare.CONSTANTS.VIDEO_SIZE.ORIGINAL,
+        videoScale: '',
+        width: '',
+        height: ''
+                
+    }; //Default options
+    
+    this.parseOptions(userOptions);
 
     this.parent = "parent";
 
@@ -195,6 +205,18 @@ Flare.MediaPlayer = function (options) {
 
 Flare.MediaPlayer.prototype = {
     
+    parseOptions: function(userOptions){
+        //REMEMBER TO SANITIZE USER INPUT
+        if (typeof userOptions.videoPath != 'undefined'){
+            
+            this.options.videoPath = userOptions.videoPath;
+            
+        }else{
+            console.log("location is not set");
+        }
+        
+    },
+    
     boot: function () {
 
         if (this.isBooted)
@@ -207,7 +229,11 @@ Flare.MediaPlayer.prototype = {
         //Initialize System
         this.oscillator = new Flare.Oscillator(this);
         this.clock = new Flare.Clock(this);
+        
         this._networkManager = new Flare.NetworkManager(this);
+        this._networkManager.requestVideo(this.options.videoPath);
+        
+        
         this.canvas = new Flare.Canvas(this);
         this.canvas.addToDOM();
 
@@ -303,15 +329,18 @@ Flare.NetworkManager = function (mediaPlayer) {
 };
 
 Flare.NetworkManager.prototype = {
+    
     connect: function () {
 
         this.socket = new WebSocket('ws://localhost:6661');
         this.socket.binaryType = 'arraybuffer';
     },
+    
     close: function () {
 
         this.socket.close();
     },
+    
     setup: function () {
 
         this.socket.onopen = this.onOpen.bind(this);
@@ -319,17 +348,21 @@ Flare.NetworkManager.prototype = {
         this.socket.onmessage = this.onMessage.bind(this);
         this.socket.onerror = this.onError.bind(this);
 
-
     },
+    
     onOpen: function () {
-
+        
+        this.connected = true;
         console.log("connection Opened");
         this.socket.send("hello");
 
     },
-    onClose: function () {
+    
+    onClose: function (message) {
         console.log("closed");
+        console.log(message);
     },
+    
     onMessage: function (message) {
         
         if (message.data instanceof ArrayBuffer ){
@@ -342,21 +375,24 @@ Flare.NetworkManager.prototype = {
             //Process as json
 
             var data = JSON.parse(message.data);
-            console.log(data);
+            console.log(data.test);
             
             
         }
         //var data = message.data;
         
     },
+    
     onError: function (e) {
         console.log(e);
     },
+    
     send: function (data) {
 
         this.socket.send(data);
 
     },
+    
     getEndianness: function () {
         var a = new ArrayBuffer(4);
         var b = new Uint8Array(a);
@@ -373,6 +409,18 @@ Flare.NetworkManager.prototype = {
         } else {
             throw new Error('Unrecognized endianness');
         }
+    },
+    
+    requestVideo: function(videoPath){
+        
+        var request = {
+            operation: "requestVideo",
+            path : videoPath
+        };
+        
+        console.log(JSON.stringify(request));
+        //this.socket.send(JSON.stringify(request));
+        
     }
 
 };
@@ -380,7 +428,7 @@ Flare.NetworkManager.prototype = {
 Flare.NetworkManager.prototype.constructor = Flare.NetworkManager;
 
 Flare.NETWORK_PROTOCOL_TABLE = {};
-Flare.NETWORK_PROTOCOL_TABLE[Flare.CONSTANTS.NETWORK.REQUEST.CONNECT] = "Connect";
+
     if (typeof exports !== 'undefined') {
         if (typeof module !== 'undefined' && module.exports) {
             exports = module.exports = Flare;

@@ -23,15 +23,18 @@ Flare.NetworkManager = function (mediaPlayer) {
 };
 
 Flare.NetworkManager.prototype = {
+    
     connect: function () {
 
         this.socket = new WebSocket('ws://localhost:6661');
         this.socket.binaryType = 'arraybuffer';
     },
+    
     close: function () {
 
         this.socket.close();
     },
+    
     setup: function () {
 
         this.socket.onopen = this.onOpen.bind(this);
@@ -39,17 +42,21 @@ Flare.NetworkManager.prototype = {
         this.socket.onmessage = this.onMessage.bind(this);
         this.socket.onerror = this.onError.bind(this);
 
-
     },
+    
     onOpen: function () {
-
+        
+        this.connected = true;
         console.log("connection Opened");
         this.socket.send("hello");
 
     },
-    onClose: function () {
+    
+    onClose: function (message) {
         console.log("closed");
+        console.log(message);
     },
+    
     onMessage: function (message) {
         
         if (message.data instanceof ArrayBuffer ){
@@ -69,14 +76,17 @@ Flare.NetworkManager.prototype = {
         //var data = message.data;
         
     },
+    
     onError: function (e) {
         console.log(e);
     },
+    
     send: function (data) {
 
         this.socket.send(data);
 
     },
+    
     getEndianness: function () {
         var a = new ArrayBuffer(4);
         var b = new Uint8Array(a);
@@ -93,6 +103,18 @@ Flare.NetworkManager.prototype = {
         } else {
             throw new Error('Unrecognized endianness');
         }
+    },
+    
+    requestVideo: function(videoPath){
+        
+        var request = {
+            operation: "requestVideo",
+            path : videoPath
+        };
+        
+        console.log(JSON.stringify(request));
+        //this.socket.send(JSON.stringify(request));
+        
     }
 
 };

@@ -1,18 +1,14 @@
 Flare.CONSTANTS = {
     //Put Constant values here
-
-    NETWORK:{
-        
-        REQUEST:{
-            
-            CONNECT: 100
-            
-        },
-        
-        RESPONSE:{
-        
-        }
-                
+    VIDEO_SIZE:{
+        ORIGINAL: 0,
+        FIXED: 1,
+        RESPONSIVE: 2
+    },
+    
+    VIDEO_SCALE_MODE : {
+        MAINTAIN_ASPECT: 0,
+        FILL: 1
     }
 
 

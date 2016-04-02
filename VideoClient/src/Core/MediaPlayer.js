@@ -1,10 +1,24 @@
-Flare.MediaPlayer = function (options) {
+Flare.MediaPlayer = function (userOptions) {
 
     /**
      * @property {number} id - video player id, for handling multiple MediaPlayer Objects
      * @readonly
      */
     this.id = Flare.PLAYERS.push(this) - 1;
+    
+    
+    this.options = {
+        
+        container : '',
+        videoPath: '',
+        videoSize : Flare.CONSTANTS.VIDEO_SIZE.ORIGINAL,
+        videoScale: '',
+        width: '',
+        height: ''
+                
+    }; //Default options
+    
+    this.parseOptions(userOptions);
 
     this.parent = "parent";
 
@@ -39,6 +53,18 @@ Flare.MediaPlayer = function (options) {
 
 Flare.MediaPlayer.prototype = {
     
+    parseOptions: function(userOptions){
+        //REMEMBER TO SANITIZE USER INPUT
+        if (typeof userOptions.videoPath != 'undefined'){
+            
+            this.options.videoPath = userOptions.videoPath;
+            
+        }else{
+            console.log("location is not set");
+        }
+        
+    },
+    
     boot: function () {
 
         if (this.isBooted)
@@ -51,7 +77,11 @@ Flare.MediaPlayer.prototype = {
         //Initialize System
         this.oscillator = new Flare.Oscillator(this);
         this.clock = new Flare.Clock(this);
+        
         this._networkManager = new Flare.NetworkManager(this);
+        this._networkManager.requestVideo(this.options.videoPath);
+        
+        
         this.canvas = new Flare.Canvas(this);
         this.canvas.addToDOM();
 
