@@ -36,6 +36,10 @@ Flare.CONSTANTS = {
     VIDEO_SCALE_MODE : {
         MAINTAIN_ASPECT: 0,
         FILL: 1
+    },
+    
+    NETWORK:{
+        REQUEST_VIDEO : 0
     }
 
 
@@ -231,7 +235,7 @@ Flare.MediaPlayer.prototype = {
         this.clock = new Flare.Clock(this);
         
         this._networkManager = new Flare.NetworkManager(this);
-        this._networkManager.requestVideo(this.options.videoPath);
+        //this._networkManager.requestVideo(this.options.videoPath);
         
         
         this.canvas = new Flare.Canvas(this);
@@ -320,6 +324,7 @@ Flare.NetworkManager = function (mediaPlayer) {
 
     this.connect();
     this.setup();
+    
 
 
     return this;
@@ -354,7 +359,8 @@ Flare.NetworkManager.prototype = {
         
         this.connected = true;
         console.log("connection Opened");
-        this.socket.send("hello");
+        //this.socket.send("hello");
+        this.requestVideo(this.mediaPlayer.options.videoPath);
 
     },
     
@@ -414,12 +420,12 @@ Flare.NetworkManager.prototype = {
     requestVideo: function(videoPath){
         
         var request = {
-            operation: "requestVideo",
+            opCode: Flare.CONSTANTS.NETWORK.REQUEST_VIDEO,
             path : videoPath
         };
         
-        console.log(JSON.stringify(request));
-        //this.socket.send(JSON.stringify(request));
+        //console.log(JSON.stringify(request));
+        this.socket.send(JSON.stringify(request));
         
     }
 

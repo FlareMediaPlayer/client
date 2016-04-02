@@ -14,6 +14,7 @@ Flare.NetworkManager = function (mediaPlayer) {
 
     this.connect();
     this.setup();
+    
 
 
     return this;
@@ -48,7 +49,8 @@ Flare.NetworkManager.prototype = {
         
         this.connected = true;
         console.log("connection Opened");
-        this.socket.send("hello");
+        //this.socket.send("hello");
+        this.requestVideo(this.mediaPlayer.options.videoPath);
 
     },
     
@@ -108,12 +110,12 @@ Flare.NetworkManager.prototype = {
     requestVideo: function(videoPath){
         
         var request = {
-            operation: "requestVideo",
+            opCode: Flare.CONSTANTS.NETWORK.REQUEST_VIDEO,
             path : videoPath
         };
         
-        console.log(JSON.stringify(request));
-        //this.socket.send(JSON.stringify(request));
+        //console.log(JSON.stringify(request));
+        this.socket.send(JSON.stringify(request));
         
     }
 

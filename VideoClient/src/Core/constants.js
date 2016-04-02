@@ -9,6 +9,10 @@ Flare.CONSTANTS = {
     VIDEO_SCALE_MODE : {
         MAINTAIN_ASPECT: 0,
         FILL: 1
+    },
+    
+    NETWORK:{
+        REQUEST_VIDEO : 0
     }
 
 

@@ -79,7 +79,7 @@ Flare.MediaPlayer.prototype = {
         this.clock = new Flare.Clock(this);
         
         this._networkManager = new Flare.NetworkManager(this);
-        this._networkManager.requestVideo(this.options.videoPath);
+        //this._networkManager.requestVideo(this.options.videoPath);
         
         
         this.canvas = new Flare.Canvas(this);
