@@ -35,6 +35,10 @@ Flare.MediaPlayer = function (userOptions) {
     this.isBooted = null;
     this.oscillator = null;
     
+    this.buffer = null;
+    
+    this.isPlaying = false;
+    
     this.testCounter = 0;
     
     
@@ -77,9 +81,11 @@ Flare.MediaPlayer.prototype = {
         //Initialize System
         this.oscillator = new Flare.Oscillator(this);
         this.clock = new Flare.Clock(this);
-        
+        this.buffer = new Flare.Buffer(this);
         this._networkManager = new Flare.NetworkManager(this);
         //this._networkManager.requestVideo(this.options.videoPath);
+        
+        
         
         
         this.canvas = new Flare.Canvas(this);
@@ -122,7 +128,13 @@ Flare.MediaPlayer.prototype = {
 
         //Finished with update, render the frame:
         //TESTING ONLY
+        
+  
         this.canvas.render(this.frames[this.testCounter%152]);
+       
+     
+        
+        
         this.testCounter++;
         //Timing is completely messed up. Need to figure out core video engine code
     }

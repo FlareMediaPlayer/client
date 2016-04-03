@@ -51,6 +51,7 @@ Flare.NetworkManager.prototype = {
         console.log("connection Opened");
         //this.socket.send("hello");
         this.requestVideo(this.mediaPlayer.options.videoPath);
+        
 
     },
     
@@ -64,7 +65,18 @@ Flare.NetworkManager.prototype = {
         if (message.data instanceof ArrayBuffer ){
             
             //All incoming binary should be images
-            console.log(message);
+
+            var dataView = new DataView(message.data);
+            var blob = new Blob([dataView], { type: 'image/bmp' });
+            var reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = function () {
+                var img = document.createElement('img');
+                img.src =  reader.result;
+                document.body.appendChild(img);
+                
+            }.bind(this);
+            
             
         }else if (typeof message.data === "string"){
             

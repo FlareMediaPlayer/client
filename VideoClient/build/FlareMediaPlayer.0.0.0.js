@@ -73,9 +73,15 @@ Flare.Buffer= function (mediaPlayer) {
     /**
     * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
     */
+   
+    
+   
     this.mediaPlayer = mediaPlayer;
+    
+    this.testFrame =  null;
 
     return this;
+    
     
     
     
@@ -191,6 +197,10 @@ Flare.MediaPlayer = function (userOptions) {
     this.isBooted = null;
     this.oscillator = null;
     
+    this.buffer = null;
+    
+    this.isPlaying = false;
+    
     this.testCounter = 0;
     
     
@@ -233,9 +243,11 @@ Flare.MediaPlayer.prototype = {
         //Initialize System
         this.oscillator = new Flare.Oscillator(this);
         this.clock = new Flare.Clock(this);
-        
+        this.buffer = new Flare.Buffer(this);
         this._networkManager = new Flare.NetworkManager(this);
         //this._networkManager.requestVideo(this.options.videoPath);
+        
+        
         
         
         this.canvas = new Flare.Canvas(this);
@@ -278,7 +290,13 @@ Flare.MediaPlayer.prototype = {
 
         //Finished with update, render the frame:
         //TESTING ONLY
+        
+  
         this.canvas.render(this.frames[this.testCounter%152]);
+       
+     
+        
+        
         this.testCounter++;
         //Timing is completely messed up. Need to figure out core video engine code
     }
@@ -361,6 +379,7 @@ Flare.NetworkManager.prototype = {
         console.log("connection Opened");
         //this.socket.send("hello");
         this.requestVideo(this.mediaPlayer.options.videoPath);
+        
 
     },
     
@@ -375,6 +394,19 @@ Flare.NetworkManager.prototype = {
             
             //All incoming binary should be images
             console.log(message);
+            var dataView = new DataView(message.data);
+            var blob = new Blob([dataView], { type: 'image/bmp' });
+            var reader = new FileReader();
+
+            
+            reader.readAsDataURL(blob);
+            reader.onloadend = function () {
+                var img = document.createElement('img');
+                img.src =  reader.result;
+                document.body.appendChild(img);
+                
+            }.bind(this);
+            
             
         }else if (typeof message.data === "string"){
             
