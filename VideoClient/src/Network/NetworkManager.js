@@ -65,8 +65,16 @@ Flare.NetworkManager.prototype = {
         if (message.data instanceof ArrayBuffer ){
             
             //All incoming binary should be images
-
+            console.log(message);
             var dataView = new DataView(message.data);
+            var opCode = dataView.getInt8(0);
+            var dataLength = dataView.getInt32(1);
+            var videoIsAvailable = dataView.getInt8(5);
+            console.log("opCode is " + opCode);
+            console.log("data Length is " + dataLength);
+            console.log("video is Available is " + videoIsAvailable);
+            
+            /*
             var blob = new Blob([dataView], { type: 'image/bmp' });
             var reader = new FileReader();
             reader.readAsDataURL(blob);
@@ -76,6 +84,7 @@ Flare.NetworkManager.prototype = {
                 document.body.appendChild(img);
                 
             }.bind(this);
+            */
             
             
         }else if (typeof message.data === "string"){
