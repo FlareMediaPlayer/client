@@ -50,7 +50,8 @@ Flare.NetworkManager.prototype = {
         this.connected = true;
         console.log("connection Opened");
         //this.socket.send("hello");
-        this.requestVideo(this.mediaPlayer.options.videoPath);
+        //this.requestVideo(this.mediaPlayer.options.videoPath);
+        this.requestVideo();
         
 
     },
@@ -65,14 +66,23 @@ Flare.NetworkManager.prototype = {
         if (message.data instanceof ArrayBuffer ){
             
             //All incoming binary should be images
-            console.log(message);
+            //console.log(message);
             var dataView = new DataView(message.data);
             var opCode = dataView.getInt8(0);
+            
+            var task = new Flare.TaskTable[opCode];
+            task.setData(message.data);
+            task.setMediaPlayer(this.mediaPlayer);
+            task.process();
+            
+            
+            /*
             var dataLength = dataView.getInt32(1);
             var videoIsAvailable = dataView.getInt8(5);
             console.log("opCode is " + opCode);
             console.log("data Length is " + dataLength);
             console.log("video is Available is " + videoIsAvailable);
+            */
             
             /*
             var blob = new Blob([dataView], { type: 'image/bmp' });
@@ -128,15 +138,25 @@ Flare.NetworkManager.prototype = {
         }
     },
     
-    requestVideo: function(videoPath){
+    requestVideo: function(){
         
+        var videoRequest = new Flare.OpenVideoMessage();
+        videoRequest.setRequestFile(this.mediaPlayer.options.videoPath);
+        //console.log(videoRequest);
+        
+        //console.log(videoRequest.toBinary());
+        this.socket.send(videoRequest.toBinary());
+        
+        /*
         var request = {
             opCode: Flare.CONSTANTS.NETWORK.REQUEST_VIDEO,
             path : videoPath
         };
         
         //console.log(JSON.stringify(request));
-        this.socket.send(JSON.stringify(request));
+        */
+        this.socket.send("hello");
+        
         
     }
 

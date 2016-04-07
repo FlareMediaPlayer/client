@@ -38,13 +38,70 @@ Flare.CONSTANTS = {
         FILL: 1
     },
     
-    NETWORK:{
-        REQUEST_VIDEO : 0
-    }
+    FLARE_MESSAGE_HEADER_LENGTH: 5,
+    
+
 
 
 };
 
+
+Flare.InitializeVideoTask= function () {
+
+
+    /**
+    * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
+    */
+   
+    this.data;
+    this.dataView;
+    this.flareOpCode;
+    this.mediaPlayer;
+    
+
+    return this;
+    
+    
+    
+    
+};
+
+Flare.InitializeVideoTask.prototype.setData = function(data) {
+
+    this.data = data;
+    this.dataView = new DataView(this.data);
+    this.flareOpCode = Flare.OpCode.OPEN_VIDEO;
+    this.videoIsAvailable = false;
+    
+};
+
+Flare.InitializeVideoTask.prototype.setMediaPlayer = function(mediaPlayer) {
+
+    this.mediaPlayer = mediaPlayer
+    
+};
+
+
+Flare.InitializeVideoTask.prototype.process = function() {
+
+    var dataLength = this.dataView.getInt32(1);
+    var videoIsAvailable = this.dataView.getInt8(5);
+    console.log("the video you requested is " + this.mediaPlayer.options.videoPath);
+    console.log(videoIsAvailable);
+    
+    if(videoIsAvailable === 1){
+       this.videoIsAvailable = true; 
+       console.log("video is available!");
+    }else{
+        console.log("video is not available!");
+    }
+
+    
+    
+    
+};
+
+Flare.InitializeVideoTask.prototype.constructor = Flare.InitializeVideoTask;
 
 Flare.AudioEngine= function (mediaPlayer) {
 
@@ -326,6 +383,124 @@ Flare.VideoEngine.prototype = {
 };
 
 Flare.VideoEngine.prototype.constructor = Flare.VideoEngine;
+/* 
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+
+Flare.FlareMessage = function(){
+    this.flareOpCode; //1 byte
+    
+    this.totalMessageLength; //int
+    this.dataLength; // int
+    
+    this.headerLength = 5;
+ 
+    return this;
+};
+
+Flare.FlareMessage.prototype = {
+    
+    addStringToBinary : function(dataView , offset, string){
+        
+        dataView.setUint8(offset , (string.length & 0xff));//Add The length of string
+   
+        for(var index = 0; index < string.length; index ++){
+            dataView.setUint8(index + 1 + offset , string.charCodeAt(index));
+        }
+        
+        
+        
+        
+    }
+  
+    
+};
+
+Flare.Buffer.prototype.constructor = Flare.FlareMessage;
+
+
+
+    
+
+
+
+Flare.OpenVideoMessage = function () {
+
+    Flare.FlareMessage.call(this);//Inherit from flaremessage
+
+    this.flareOpCode = Flare.OpCode.OPEN_VIDEO;
+
+    this.requestFile = "";
+
+    return this;
+
+
+
+};
+
+Flare.OpenVideoMessage.prototype = Object.create(Flare.FlareMessage.prototype);
+Flare.OpenVideoMessage.prototype.constructor = Flare.OpenVideoMessage;
+
+
+
+Flare.OpenVideoMessage.prototype.setRequestFile = function (requestFile) {
+
+    this.requestFile = requestFile;
+
+};
+
+Flare.OpenVideoMessage.prototype.toBinary = function () {
+
+    this.dataLength = this.requestFile.length + 1;
+    this.totalMessageLength = this.dataLength + this.headerLength;
+
+    var data = new ArrayBuffer(this.totalMessageLength);
+    var dataView = new DataView(data);
+
+
+
+
+
+    dataView.setInt8(0, (this.flareOpCode & 0xff));//Set The Op Code
+    dataView.setInt32(1, (this.totalMessageLength & 0xffffffff));//Set The Op Code
+
+    this.addStringToBinary(dataView, this.headerLength, this.requestFile); // add the request string
+    
+    /*
+    //For testing what the byte array looks like
+    for(var test = 0; test < this.totalMessageLength; test++){
+        console.log("byte Number :" + test + "  : "+ dataView.getUint8(test));
+    }
+    */
+
+
+    return data;
+
+
+};
+
+
+
+
+
+
+
+
+
+Flare.OpCode = {
+    //Put Constant values here
+
+    OPEN_VIDEO : 0
+
+
+
+};
+
+Flare.TaskTable = {};
+Flare.TaskTable[Flare.OpCode.OPEN_VIDEO] = Flare.InitializeVideoTask;
 
 Flare.NetworkManager = function (mediaPlayer) {
 
@@ -378,7 +553,8 @@ Flare.NetworkManager.prototype = {
         this.connected = true;
         console.log("connection Opened");
         //this.socket.send("hello");
-        this.requestVideo(this.mediaPlayer.options.videoPath);
+        //this.requestVideo(this.mediaPlayer.options.videoPath);
+        this.requestVideo();
         
 
     },
@@ -393,14 +569,23 @@ Flare.NetworkManager.prototype = {
         if (message.data instanceof ArrayBuffer ){
             
             //All incoming binary should be images
-            console.log(message);
+            //console.log(message);
             var dataView = new DataView(message.data);
             var opCode = dataView.getInt8(0);
+            
+            var task = new Flare.TaskTable[opCode];
+            task.setData(message.data);
+            task.setMediaPlayer(this.mediaPlayer);
+            task.process();
+            
+            
+            /*
             var dataLength = dataView.getInt32(1);
             var videoIsAvailable = dataView.getInt8(5);
             console.log("opCode is " + opCode);
             console.log("data Length is " + dataLength);
             console.log("video is Available is " + videoIsAvailable);
+            */
             
             /*
             var blob = new Blob([dataView], { type: 'image/bmp' });
@@ -456,15 +641,25 @@ Flare.NetworkManager.prototype = {
         }
     },
     
-    requestVideo: function(videoPath){
+    requestVideo: function(){
         
+        var videoRequest = new Flare.OpenVideoMessage();
+        videoRequest.setRequestFile(this.mediaPlayer.options.videoPath);
+        //console.log(videoRequest);
+        
+        //console.log(videoRequest.toBinary());
+        this.socket.send(videoRequest.toBinary());
+        
+        /*
         var request = {
             opCode: Flare.CONSTANTS.NETWORK.REQUEST_VIDEO,
             path : videoPath
         };
         
         //console.log(JSON.stringify(request));
-        this.socket.send(JSON.stringify(request));
+        */
+        this.socket.send("hello");
+        
         
     }
 

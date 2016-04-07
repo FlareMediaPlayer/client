@@ -11,9 +11,9 @@ Flare.CONSTANTS = {
         FILL: 1
     },
     
-    NETWORK:{
-        REQUEST_VIDEO : 0
-    }
+    FLARE_MESSAGE_HEADER_LENGTH: 5,
+    
+
 
 
 };
