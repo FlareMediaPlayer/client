@@ -15,22 +15,12 @@ Flare.Device = function () {
      * @protected
      */
     this.initialized = false;
-
-    //  Browser / Host / Operating System
-
-
-    this.isDesktop = false;
-    this.isIOS = false;
-    this.iOSVersion = 0;
-    this.isAndroid = false;
-    this.isChromeOS = false;
-    this.isLinux = false;
-    this.isOSX = false;
-    this.isWindows = false;
-    this.isWindowsPhone = false;
+    /* Device need to check if the browser can do websocket
+     - Is it touch ?
+     - Make a handler to get DOM info so we can tell if the video is in the view port and stuff like that
+    */
 
     //  Features
-
     this.hasCanvas = false;
     this.hasWebGL = false;
     this.hasFile = false;
@@ -42,39 +32,13 @@ Flare.Device = function () {
     this.hasVibration = false;
 
     //  Input
-
     this.hasTouch = false;
     this.hasMousePointer = false;
     this.hasWheelEvent = null;
 
-    // Browser
-    this.isChrome = false;
-    this.chromeVersion = 0;
-    this.isEpiphany = false;
-    this.isFirefox = false;
-    this.firefoxVersion = 0;
-    this.isIe = false;
-    this.ieVersion = 0;
-    this.isTrident = false;
-    this.tridentVersion = 0;
-    this.isEdge = false;
-    this.isMobileIOS = false;
-    this.isMidori = false;
-    this.isOpera = false;
-    this.isSafari = false;
-    this.safariVersion = 0;
-    this.isWebApp = false;
-    this.isSilk = false;
-
     //  Audio
-
     this.hasAudioData = false;
     this.hasWebAudio = false;
-
-
-    //  Device
-    this.isIPhone = false;
-    this.isIPad = false;
 
     // Device features
     this.pixelRatio = 0;
@@ -90,9 +54,98 @@ Flare.Device = function () {
 
 //Make Singleton
 Flare.Device = new Flare.Device();
+function supportsCanvas(){
+    var c = document.createElement('canvas');
+    return !!c.getContext;
+}
+
+function supportsWebAudio(){
+    var hasWebKitAudio = 'webkitAudioContext' in window;
+    var hasAudioContext = 'AudioContext' in window;
+
+    if( ! (hasWebKitAudio || hasAudioContext)){
+        var audioElement = document.createElement('audio');
+        return audioElement.canPlayType;
+    }
+    return true;
+}
+
+function supportsWebGL(){
+    try {
+      var canvas = document.createElement('canvas');
+      var ctx = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    }
+    catch (e) {
+      return false;
+    }
+    return ctx;
+}
+
+function supportsHTML5Storage(){
+    try{
+        return 'localStorage' in window && window['localStorage'] !== null;
+    }
+    catch(e){
+        return false;
+    }
+}
+
+function supportsCss3D(){
+    if(!!window.getComputedStyle){//  The browser does not support getComputedStyle
+        return false;
+    }
+    var element = document.createElement('p'); //Creating a random element
+    var transforms = {
+            'webkitTransform':'-webkit-transform',
+            'OTransform':'-o-transform',
+            'msTransform':'-ms-transform',
+            'MozTransform':'-moz-transform',
+            'transform':'transform'
+    };
+    document.body.insertBefore(element, null);
+    for(var t in transforms){
+        if(!!element[t]){
+            el.style[t] = "translate3d(1px,1px,1px)";
+            has3d = window.getComputedStyle(el).getPropertyValue(transforms[t]);
+        }
+    }
+    document.body.removeChild(element);
+
+    return !!has3d && has3d !==  "none";
+}
+
 
 Flare.Device._initialize = function () {
-    //Check do device check
+
+     //  Features
+    this.hasCanvas = supportsCanvas();
+    this.hasWebGL = supportsWebGL();
+    this.hasFile = false;// ?
+    this.hasFileSystem = false; // ??
+    this.hasLocalStorage = supportsHTML5Storage();
+    this.hasCss3D = supportsCss3D();
+    this.hasPointerLock = false;
+    this.hasTypedArray = false;
+    this.hasVibration = false;
+
+    //  Input
+    this.hasTouch = false;
+    this.hasMousePointer = false;
+    this.hasWheelEvent = null;
+
+    //  Audio
+    this.hasAudioData = false;
+    this.hasWebAudio = supportsWebAudio();
+
+    // Device features
+    this.pixelRatio = 0;
+    this.littleEndian = false;
+    this.LITTLE_ENDIAN = false;
+    this.supports32bit = false;
+    this.fullscreen = false;
+
+    this.deviceReadyAt = 0;
+
 };
 
 Flare.Device.whenReady = function (callback, context) {
@@ -139,7 +192,7 @@ Flare.Device._readyCheck = function () {
         window.setTimeout(readyCheck._monitor, 20);
 
     } else if (!this.deviceReadyAt) {
-        
+
         this.deviceReadyAt = Date.now();
 
         document.removeEventListener('deviceready', readyCheck._monitor);
