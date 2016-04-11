@@ -883,28 +883,27 @@ Flare.Device = function () {
     this.hasCanvas = false;
     this.hasWebGL = false;
     this.hasFile = false;
-    this.hasFileSystem = false;
+    //this.hasFileSystem = false;
     this.hasLocalStorage = false;
     this.hasCss3D = false;
-    this.hasPointerLock = false;
+    //this.hasPointerLock = false;
     this.hasTypedArray = false;
-    this.hasVibration = false;
+    //this.hasVibration = false;
 
     //  Input
     this.hasTouch = false;
-    this.hasMousePointer = false;
-    this.hasWheelEvent = null;
+    //this.hasMousePointer = false;
+    //this.hasWheelEvent = null;
 
     //  Audio
-    this.hasAudioData = false;
+    //this.hasAudioData = false;
     this.hasWebAudio = false;
 
     // Device features
-    this.pixelRatio = 0;
     this.littleEndian = false;
-    this.LITTLE_ENDIAN = false;
-    this.supports32bit = false;
+    this.bigEndian = false;
     this.fullscreen = false;
+    this.webSocket = false;
 
 
 
@@ -969,42 +968,67 @@ function supportsCss3D(){
         }
     }
     document.body.removeChild(element);
-
-    return !!has3d && has3d !==  "none";
+    return !!has3d && has3d.length > 0 && has3d !==  "none";
 }
 
+function isTouch(){
+    return ('ontouchstart' in window) && (window.navigator.MaxTouchPoints > 0);
+}
+
+function supportsInputFile(){
+    try{
+        var inputElement = document.createElement("input");
+        inputElement.setAttribute("type", "file");
+    }
+    catch(e){
+        return false;
+    }
+    return inputElement.type !== "text";  // If type = text, the web browser didn't make  <input>
+}
+
+function supportsFullscreen(){
+    var documentEl = document.documentElement;
+    return ((!!documentEl.requestFullscreen)
+            || !!documentEl.mozRequestFullScreen
+            || !!documentEl.webkitRequestFullScreen
+            || !!documentEl.msRequestFullscreen);
+}
+function supportsWebSocket(){
+    try{
+        return 'WebSocket' in window && window.WebSocket.CLOSING === 2;
+    }
+    catch(e){
+        return false;
+    }
+}
 
 Flare.Device._initialize = function () {
 
      //  Features
     this.hasCanvas = supportsCanvas();
     this.hasWebGL = supportsWebGL();
-    this.hasFile = false;// ?
-    this.hasFileSystem = false; // ??
+    this.hasFile = supportsInputFile();
+    //this.hasFileSystem = false; // ??
     this.hasLocalStorage = supportsHTML5Storage();
-    this.hasCss3D = supportsCss3D();
-    this.hasPointerLock = false;
-    this.hasTypedArray = false;
-    this.hasVibration = false;
+    //this.hasCss3D = supportsCss3D();
+    //this.hasPointerLock = false;
+    this.hasTypedArray = 'ArrayBuffer' in window;
+    //this.hasVibration = false;
 
     //  Input
-    this.hasTouch = false;
-    this.hasMousePointer = false;
-    this.hasWheelEvent = null;
+    this.hasTouch = isTouch();
+    // this.hasMousePointer = false; Why do we need this? 
+    //this.hasWheelEvent = null;
 
     //  Audio
-    this.hasAudioData = false;
+    //this.hasAudioData = false;
     this.hasWebAudio = supportsWebAudio();
 
     // Device features
-    this.pixelRatio = 0;
     this.littleEndian = false;
-    this.LITTLE_ENDIAN = false;
-    this.supports32bit = false;
-    this.fullscreen = false;
-
-    this.deviceReadyAt = 0;
-
+    this.bigEndian = false;
+    this.webSocket = supportsWebSocket();
+    this.fullscreen = supportsFullscreen();
 };
 
 Flare.Device.whenReady = function (callback, context) {
@@ -1037,7 +1061,6 @@ Flare.Device.whenReady = function (callback, context) {
             window.addEventListener('load', readyCheck._monitor, false);
         }
     }
-
 };
 
 
@@ -1073,8 +1096,7 @@ Flare.Device._readyCheck = function () {
         this._readyCheck = null;
         this._initialize = null;
         this.onInitialized = null;
-    }
-
+    }   
 };
 //Going to need this so that we can have multiple listeners for multiple videos or multiple protocool callbacks and stuff
 Flare.EventDispatcher = function () {
