@@ -2,6 +2,7 @@
 Flare.Device = function () {
 
 
+
     /**
      * The time the device became ready.
      * @property {integer} deviceReadyAt
