@@ -1,6 +1,4 @@
-
-Flare.Device = function () {
-
+Flare.Device = function() {
 
 
     /**
@@ -54,99 +52,96 @@ Flare.Device = function () {
 
 //Make Singleton
 Flare.Device = new Flare.Device();
-function supportsCanvas(){
-    var c = document.createElement('canvas');
-    return !!c.getContext;
-}
 
-function supportsWebAudio(){
-    var hasWebKitAudio = 'webkitAudioContext' in window;
-    var hasAudioContext = 'AudioContext' in window;
 
-    if( ! (hasWebKitAudio || hasAudioContext)){
-        var audioElement = document.createElement('audio');
-        return audioElement.canPlayType;
-    }
-    return true;
-}
+Flare.Device._initialize = function() {
 
-function supportsWebGL(){
-    try {
-      var canvas = document.createElement('canvas');
-      var ctx = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    function supportsCanvas() {
+        var c = document.createElement('canvas');
+        return !!c.getContext;
     }
-    catch (e) {
-      return false;
-    }
-    return !!ctx;
-}
 
-function supportsHTML5Storage(){
-    try{
-        return 'localStorage' in window && window['localStorage'] !== null;
-    }
-    catch(e){
-        return false;
-    }
-}
+    function supportsWebAudio() {
+        var hasWebKitAudio = 'webkitAudioContext' in window;
+        var hasAudioContext = 'AudioContext' in window;
 
-function supportsCss3D(){
-    if(!!window.getComputedStyle){//  The browser does not support getComputedStyle
-        return false;
+        if (!(hasWebKitAudio || hasAudioContext)) {
+            var audioElement = document.createElement('audio');
+            return audioElement.canPlayType;
+        }
+        return true;
     }
-    var element = document.createElement('p'); //Creating a random element
-    var transforms = {
-            'webkitTransform':'-webkit-transform',
-            'OTransform':'-o-transform',
-            'msTransform':'-ms-transform',
-            'MozTransform':'-moz-transform',
-            'transform':'transform'
-    };
-    document.body.insertBefore(element, null);
-    for(var t in transforms){
-        if(!!element[t]){
-            el.style[t] = "translate3d(1px,1px,1px)";
-            has3d = window.getComputedStyle(el).getPropertyValue(transforms[t]);
+
+    function supportsWebGL() {
+        try {
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        } catch (e) {
+            return false;
+        }
+        return !!ctx;
+    }
+
+    function supportsHTML5Storage() {
+        try {
+            return 'localStorage' in window && window['localStorage'] !== null;
+        } catch (e) {
+            return false;
         }
     }
-    document.body.removeChild(element);
-    return !!has3d && has3d.length > 0 && has3d !==  "none";
-}
 
-function isTouch(){
-    return ('ontouchstart' in window) && (window.navigator.MaxTouchPoints > 0);
-}
-
-function supportsInputFile(){
-    try{
-        var inputElement = document.createElement("input");
-        inputElement.setAttribute("type", "file");
+    function supportsCss3D() {
+        if (!!window.getComputedStyle) { //  The browser does not support getComputedStyle
+            return false;
+        }
+        var element = document.createElement('p'); //Creating a random element
+        var transforms = {
+            'webkitTransform': '-webkit-transform',
+            'OTransform': '-o-transform',
+            'msTransform': '-ms-transform',
+            'MozTransform': '-moz-transform',
+            'transform': 'transform'
+        };
+        document.body.insertBefore(element, null);
+        for (var t in transforms) {
+            if (!!element[t]) {
+                el.style[t] = "translate3d(1px,1px,1px)";
+                has3d = window.getComputedStyle(el).getPropertyValue(transforms[t]);
+            }
+        }
+        document.body.removeChild(element);
+        return !!has3d && has3d.length > 0 && has3d !== "none";
     }
-    catch(e){
-        return false;
-    }
-    return inputElement.type !== "text";  // If type = text, the web browser didn't make  <input>
-}
 
-function supportsFullscreen(){
-    var documentEl = document.documentElement;
-    return ((!!documentEl.requestFullscreen)
-            || !!documentEl.mozRequestFullScreen
-            || !!documentEl.webkitRequestFullScreen
-            || !!documentEl.msRequestFullscreen);
-}
-function supportsWebSocket(){
-    try{
-        return 'WebSocket' in window && window.WebSocket.CLOSING === 2;
+    function isTouch() {
+        return ('ontouchstart' in window) && (window.navigator.MaxTouchPoints > 0);
     }
-    catch(e){
-        return false;
+
+    function supportsInputFile() {
+        try {
+            var inputElement = document.createElement("input");
+            inputElement.setAttribute("type", "file");
+        } catch (e) {
+            return false;
+        }
+        return inputElement.type !== "text"; // If type = text, the web browser didn't make  <input>
     }
-}
 
-Flare.Device._initialize = function () {
+    function supportsFullscreen() {
+        var documentEl = document.documentElement;
+        return ((!!documentEl.requestFullscreen) || !!documentEl.mozRequestFullScreen || !!documentEl.webkitRequestFullScreen || !!documentEl.msRequestFullscreen);
+    }
 
-     //  Features
+    function supportsWebSocket() {
+        try {
+            return 'WebSocket' in window && window.WebSocket.CLOSING === 2;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    /** Variable initialization     */
+    
     this.hasCanvas = supportsCanvas();
     this.hasWebGL = supportsWebGL();
     this.hasFile = supportsInputFile();
@@ -173,7 +168,7 @@ Flare.Device._initialize = function () {
     this.fullscreen = supportsFullscreen();
 };
 
-Flare.Device.whenReady = function (callback, context) {
+Flare.Device.whenReady = function(callback, context) {
 
     var readyCheck = this._readyCheck;
 
@@ -206,12 +201,11 @@ Flare.Device.whenReady = function (callback, context) {
 };
 
 
-Flare.Device._readyCheck = function () {
+Flare.Device._readyCheck = function() {
 
     var readyCheck = this._readyCheck;
 
-    if (!document.body)
-    {
+    if (!document.body) {
 
         window.setTimeout(readyCheck._monitor, 20);
 
@@ -228,8 +222,7 @@ Flare.Device._readyCheck = function () {
 
 
         var item;
-        while ((item = readyCheck._queue.shift()))
-        {
+        while ((item = readyCheck._queue.shift())) {
             var callback = item[0];
             var context = item[1];
             callback.call(context, this);
@@ -238,5 +231,5 @@ Flare.Device._readyCheck = function () {
         this._readyCheck = null;
         this._initialize = null;
         this.onInitialized = null;
-    }   
+    }
 };
