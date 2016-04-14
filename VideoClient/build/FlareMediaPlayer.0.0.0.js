@@ -124,6 +124,27 @@ Flare.AudioEngine.prototype = {
 
 Flare.AudioEngine.prototype.constructor = Flare.AudioEngine;
 
+Flare.AudioPlayer= function (mediaPlayer) {
+
+
+    /**
+    * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
+    */
+    this.mediaPlayer = mediaPlayer;
+
+    return this;
+    
+    
+    
+};
+
+Flare.AudioPlayer.prototype = {
+
+
+};
+
+Flare.AudioPlayer.prototype.constructor = Flare.AudioPlayer;
+
 Flare.Buffer= function (mediaPlayer) {
 
 
@@ -151,19 +172,20 @@ Flare.Buffer.prototype = {
 
 Flare.Buffer.prototype.constructor = Flare.Buffer;
 
-Flare.Canvas = function (mediaPlayer) {
+Flare.Canvas = function (videoPlayer) {
 
     /**
      * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
      */
-    this.mediaPlayer = mediaPlayer;
+    //this.mediaPlayer = mediaPlayer;
+    this.videoPlayer = videoPlayer;
 
 
     //Private canvas element
     this.canvas = document.createElement('canvas');
     this.ctx = this.canvas.getContext("2d");
 
-    this.canvas.id = mediaPlayer.id;
+    this.canvas.id ="testId" ;//mediaPlayer.id;
 
     //for now hard code
     this.canvas.width = 960;
@@ -180,38 +202,17 @@ Flare.Canvas = function (mediaPlayer) {
 
 Flare.Canvas.prototype = {
     
-    addToDOM: function () {
-
-        var target;
-        var parent = this.mediaPlayer.parent;
-
-        
-        if (parent)
-        {
-            if (typeof parent === 'string')
-            {
-                target = document.getElementById(parent);
-            } else if (typeof parent === 'object' && parent.nodeType === 1)
-            {
-                target = parent;
-            }
-        }
-        
-        // Fallback, covers an invalid ID and a non HTMLelement object
-        if (!target){
-            
-            target = document.body;
-        }
-
-        target.appendChild(this.canvas);
-
-    },
-    
     render: function(frame){
+        
         this.ctx.drawImage(frame, 0 ,0);
         //RENDER LOGIC GOES HERE
-        //THE ARGUMENT IS THE FULLY RENDERED FRAME, JUST NEED TO PAINT TO THE CANVAS
+        //THE ARGUMENT IS THE FULLY RENDERED FRAME, JUST NEED TO PAINT TO THE CANVAS  
         
+    },
+    
+    getCanvas: function(){
+        
+        return this.canvas;
         
     }
 };
@@ -232,8 +233,8 @@ Flare.MediaPlayer = function (userOptions) {
         videoPath: '',
         videoSize : Flare.CONSTANTS.VIDEO_SIZE.ORIGINAL,
         videoScale: '',
-        width: '',
-        height: ''
+        width: 960,
+        height: 540
                 
     }; //Default options
     
@@ -253,6 +254,7 @@ Flare.MediaPlayer = function (userOptions) {
     this._forceUpdate;
     this.isBooted = null;
     this.oscillator = null;
+    this.videoPlayer = null;
     
     this.buffer = null;
     
@@ -306,9 +308,10 @@ Flare.MediaPlayer.prototype = {
         
         
         
+        this.videoPlayer = new Flare.VideoPlayer(this);
         
-        this.canvas = new Flare.Canvas(this);
-        this.canvas.addToDOM();
+        //this.canvas = new Flare.Canvas(this);
+        //this.canvas.addToDOM();
 
 
         //FOR TESTING ONLY
@@ -327,10 +330,11 @@ Flare.MediaPlayer.prototype = {
         }
         //END TESTING
         
-        
+        this.videoPlayer.boot();
         //Okay now start the oscillator
         this.clock.boot();
         this.oscillator.run();
+       
         
         
 
@@ -349,7 +353,8 @@ Flare.MediaPlayer.prototype = {
         //TESTING ONLY
         
   
-        this.canvas.render(this.frames[this.testCounter%152]);
+        //this.canvas.render(this.frames[this.testCounter%152]);
+        this.videoPlayer.update(this.frames[this.testCounter%152]);
        
      
         
@@ -370,7 +375,10 @@ Flare.VideoEngine= function (mediaPlayer) {
     * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
     */
     this.mediaPlayer = mediaPlayer;
-
+    this.canvas = null;
+    this.videoWidth;
+    this.videoHeight;
+    this.videoPlayer = null;
     return this;
     
     
@@ -378,11 +386,122 @@ Flare.VideoEngine= function (mediaPlayer) {
 };
 
 Flare.VideoEngine.prototype = {
+    
+    boot: function(){
+            var target;
+        var parent = this.mediaPlayer.parent;
 
+        
+        if (parent)
+        {
+            if (typeof parent === 'string')
+            {
+                target = document.getElementById(parent);
+            } else if (typeof parent === 'object' && parent.nodeType === 1)
+            {
+                target = parent;
+            }
+        }
+        
+        // Fallback, covers an invalid ID and a non HTMLelement object
+        if (!target){
+            
+            target = document.body;
+        }
+        
+        
+        target.appendChild(this.videoPlayer);
+    },
+    
+    initialize: function(){
+        
+        this.videoPlayer = document.createElement('div');
+        this.videoPlayer.id = "videoId";
+        
+        this.canvas = new Flare.Canvas();
+        
+
+        
+        
+    }
+    
+    
 
 };
 
 Flare.VideoEngine.prototype.constructor = Flare.VideoEngine;
+
+Flare.VideoPlayer= function (mediaPlayer) {
+
+
+    /**
+    * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
+    */
+    this.mediaPlayer = mediaPlayer;
+    this.canvas = null;
+    this.videoWidth;
+    this.videoHeight;
+    this.videoPlayer = null;
+    return this;
+    
+    
+    
+};
+
+Flare.VideoPlayer.prototype = {
+    
+    boot: function(){
+        
+        this.videoPlayer = document.createElement("div");
+        this.videoPlayer.id = "videoId";
+        this.videoPlayer.style.height = '540px';
+        this.videoPlayer.style.width = '960px';
+        
+        this.canvas = new Flare.Canvas(this);
+        
+        this.videoPlayer.appendChild(this.canvas.getCanvas());
+        
+        
+        
+        var target;
+        var parent = null;//this.mediaPlayer.parent;
+
+        
+        if (parent)
+        {
+            if (typeof parent === 'string')
+            {
+                target = document.getElementById(parent);
+            } else if (typeof parent === 'object' && parent.nodeType === 1)
+            {
+                target = parent;
+            }
+        }
+        
+        // Fallback, covers an invalid ID and a non HTMLelement object
+        if (!target){
+            
+            target = document.body;
+        }
+        
+        
+        target.appendChild(this.videoPlayer);
+    },
+    
+
+    
+    update: function(frame){
+    
+        this.canvas.render(frame);
+        
+    }
+    
+    
+    
+
+};
+
+Flare.VideoPlayer.prototype.constructor = Flare.VideoPlayer;
 /* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates

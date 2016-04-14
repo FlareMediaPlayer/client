@@ -13,8 +13,8 @@ Flare.MediaPlayer = function (userOptions) {
         videoPath: '',
         videoSize : Flare.CONSTANTS.VIDEO_SIZE.ORIGINAL,
         videoScale: '',
-        width: '',
-        height: ''
+        width: 960,
+        height: 540
                 
     }; //Default options
     
@@ -34,6 +34,7 @@ Flare.MediaPlayer = function (userOptions) {
     this._forceUpdate;
     this.isBooted = null;
     this.oscillator = null;
+    this.videoPlayer = null;
     
     this.buffer = null;
     
@@ -87,9 +88,10 @@ Flare.MediaPlayer.prototype = {
         
         
         
+        this.videoPlayer = new Flare.VideoPlayer(this);
         
-        this.canvas = new Flare.Canvas(this);
-        this.canvas.addToDOM();
+        //this.canvas = new Flare.Canvas(this);
+        //this.canvas.addToDOM();
 
 
         //FOR TESTING ONLY
@@ -108,10 +110,11 @@ Flare.MediaPlayer.prototype = {
         }
         //END TESTING
         
-        
+        this.videoPlayer.boot();
         //Okay now start the oscillator
         this.clock.boot();
         this.oscillator.run();
+       
         
         
 
@@ -130,7 +133,8 @@ Flare.MediaPlayer.prototype = {
         //TESTING ONLY
         
   
-        this.canvas.render(this.frames[this.testCounter%152]);
+        //this.canvas.render(this.frames[this.testCounter%152]);
+        this.videoPlayer.update(this.frames[this.testCounter%152]);
        
      
         

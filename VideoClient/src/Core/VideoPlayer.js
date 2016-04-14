@@ -1,5 +1,5 @@
 
-Flare.VideoEngine= function (mediaPlayer) {
+Flare.VideoPlayer= function (mediaPlayer) {
 
 
     /**
@@ -16,11 +16,23 @@ Flare.VideoEngine= function (mediaPlayer) {
     
 };
 
-Flare.VideoEngine.prototype = {
+Flare.VideoPlayer.prototype = {
     
     boot: function(){
-            var target;
-        var parent = this.mediaPlayer.parent;
+        
+        this.videoPlayer = document.createElement("div");
+        this.videoPlayer.id = "videoId";
+        this.videoPlayer.style.height = '540px';
+        this.videoPlayer.style.width = '960px';
+        
+        this.canvas = new Flare.Canvas(this);
+        
+        this.videoPlayer.appendChild(this.canvas.getCanvas());
+        
+        
+        
+        var target;
+        var parent = null;//this.mediaPlayer.parent;
 
         
         if (parent)
@@ -44,20 +56,17 @@ Flare.VideoEngine.prototype = {
         target.appendChild(this.videoPlayer);
     },
     
-    initialize: function(){
-        
-        this.videoPlayer = document.createElement('div');
-        this.videoPlayer.id = "videoId";
-        
-        this.canvas = new Flare.Canvas();
-        
 
-        
+    
+    update: function(frame){
+    
+        this.canvas.render(frame);
         
     }
+    
     
     
 
 };
 
-Flare.VideoEngine.prototype.constructor = Flare.VideoEngine;
+Flare.VideoPlayer.prototype.constructor = Flare.VideoPlayer;
