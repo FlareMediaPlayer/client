@@ -442,6 +442,25 @@ Flare.VideoPlayer= function (mediaPlayer) {
     this.videoWidth;
     this.videoHeight;
     this.videoPlayer = null;
+    this.controlBar = null;
+    
+    this.videoPlayerAttributes = {
+      position: 'relative',
+      overflow: 'hidden',
+      width: '960px',
+      height: '540px'
+      
+    };
+    
+    this.controlBarAttributes = {
+        height: '30px',
+        position: 'absolute',
+        bottom: '0',
+        left: 0 ,
+        right: 0 ,
+        'background-color': 'rgba(0,0,0,0.5)'
+    };
+    
     return this;
     
     
@@ -454,13 +473,17 @@ Flare.VideoPlayer.prototype = {
         
         this.videoPlayer = document.createElement("div");
         this.videoPlayer.id = "videoId";
-        this.videoPlayer.style.height = '540px';
-        this.videoPlayer.style.width = '960px';
-        
+
+
         this.canvas = new Flare.Canvas(this);
-        
         this.videoPlayer.appendChild(this.canvas.getCanvas());
         
+        this.controlBar = document.createElement("div");
+
+
+        this.setAttributes(this.videoPlayer, this.videoPlayerAttributes);
+        this.setAttributes(this.controlBar, this.controlBarAttributes);
+        this.videoPlayer.appendChild(this.controlBar);
         
         
         var target;
@@ -494,6 +517,15 @@ Flare.VideoPlayer.prototype = {
     
         this.canvas.render(frame);
         
+    },
+    
+    setAttributes : function(element, attributes){
+        
+        for (var attribute in attributes){
+            element.style.setProperty(attribute, attributes[attribute]);
+        }
+        
+
     }
     
     
