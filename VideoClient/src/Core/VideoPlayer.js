@@ -49,12 +49,17 @@ Flare.VideoPlayer= function (mediaPlayer) {
         left : 0,
         width : '100%',
         height : '100%',
+        'touch-action' : 'none'
         
     };
     
     this.progressBarAttribtues = {
         role: 'slider',
-        draggable: 'true'
+        draggable: 'true',
+        'aria-valuemin' : 0,
+        'aria-valuemax' : 100,
+        'aria-valuenow' : 0,
+        //'tabindex' : 0
         
     };
     
@@ -169,7 +174,12 @@ Flare.VideoPlayer.prototype = {
         this.controlBar.appendChild(this.progressBarContainer);
         this.controlBar.appendChild(this.controlBarInner);
         
-        
+        //BIND HANDLERS
+        this.progressBar.onmousedown = this.handleMouseDown.bind(this);
+        this.progressBar.ondragstart = this.handleDragStart.bind(this);
+        this.progressBar.ondrag = this.handleDrag.bind(this);
+        this.progressBar.ondragend = this.handleDragEnd.bind(this);
+        this.playButton.onclick = this.handlePlayButtonPress.bind(this);
         
         this.videoPlayer.appendChild(this.controlBar);
         
@@ -231,6 +241,42 @@ Flare.VideoPlayer.prototype = {
     
     updatePlayProgress: function (progress){
         this.playProgress.style.setProperty("transform", "scaleX(" + progress + ")");
+        this.progressBar.setAttribute("aria-valuenow" , parseInt(progress*100));
+    },
+    
+    handleMouseDown:function (e){
+        var currentProgress = parseInt(this.progressBar.getAttribute('aria-valuenow'));
+        this.mediaPlayer.isPlaying = false;
+        
+        return false;
+    },
+    
+    handleDragStart: function(e){
+        
+        console.log("currentProgress" + currentProgress);
+        
+    },
+    
+    handleDrag: function(e){
+        
+        //Continuously calculate position and update
+        
+    },
+    
+    handleDragEnd: function(e){
+        
+    },
+    
+    handlePlayButtonPress: function(e){
+        console.log("play clicked");
+        this.mediaPlayer.togglePlay();
+        
+        if(this.mediaPlayer.isPlayMode()){
+            this.playButton.innerHTML = "||";
+        }else{
+            this.playButton.innerHTML = "&#x025B8;";
+        }
+        
     }
     
     
