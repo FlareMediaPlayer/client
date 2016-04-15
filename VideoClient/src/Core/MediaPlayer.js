@@ -134,12 +134,12 @@ Flare.MediaPlayer.prototype = {
         
   
         //this.canvas.render(this.frames[this.testCounter%152]);
-        this.videoPlayer.update(this.frames[this.testCounter%152]);
+        this.videoPlayer.update(this.frames[this.testCounter] , this.testCounter);
        
      
         
         
-        this.testCounter++;
+        this.testCounter = (this.testCounter + 1) %151;
         //Timing is completely messed up. Need to figure out core video engine code
     }
     

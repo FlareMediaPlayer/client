@@ -11,27 +11,66 @@ Flare.VideoPlayer= function (mediaPlayer) {
     this.videoHeight;
     this.videoPlayer;
     this.controlBar;
-    this.progressBar;
+    this.progressBarContainer;
     this.playButton;
     this.controlBarInner;
     this.leftControls;
     this.rightControls;
     this.settingsButton;
     this.settingsPath;
+    this.progressBar;
+    this.progressBarDisplayGroup;
+    this.playProgress;
     
-    this.rightControlsAttributes = {
+    this.playProgressStyle = {
+        position: 'absolute',
+        bottom : 0,
+        left: '0px',
+        'background-color':'rgba(0,0,255,0.7)',
+        height : '100%',
+        width : '100%',
+        'transform-origin' : '0 0 '
+        
+    };
+    
+    this.progressBarDisplayGroupStyle = {
+        height: '100%',
+        //transform: 'scaleY(0.5)',
+        transition: 'transform .1s cubic-bezier(0.4,0.0,1,1)',
+        'background-color': 'rgba(255,255,255,0.6)',
+        'transform-origin' : 'bottom'
+        
+        
+    };
+    
+    this.progressBarStyle={
+        position : 'absolute',
+        bottom : 0,
+        left : 0,
+        width : '100%',
+        height : '100%',
+        
+    };
+    
+    this.progressBarAttribtues = {
+        role: 'slider',
+        draggable: 'true'
+        
+    };
+    
+    this.rightControlsStyle = {
         float : 'right',
         height: '100%'
     };
     
     
     
-    this.leftControlsAttributes = {
+    this.leftControlsStyle = {
         float : 'left',
         height : '100%'
     };
     
-    this.videoPlayerAttributes = {
+    this.videoPlayerStyle = {
       position: 'relative',
       overflow: 'hidden',
       width: '960px',
@@ -39,11 +78,11 @@ Flare.VideoPlayer= function (mediaPlayer) {
       
     };
     
-    this.controlBarInnerAttributes = {
+    this.controlBarInnerStyle = {
         
     };
     
-    this.controlBarAttributes = {
+    this.controlBarStyle = {
         height: '30px',
         position: 'absolute',
         bottom: '0',
@@ -52,7 +91,7 @@ Flare.VideoPlayer= function (mediaPlayer) {
         'background-color': 'rgba(0,0,0,0.5)'
     };
     
-    this.playButtonAttributes = {
+    this.playButtonStyle = {
         color: 'white',
         'font-size': '20px',
         background : 'transparent',
@@ -61,13 +100,13 @@ Flare.VideoPlayer= function (mediaPlayer) {
         
     };
     
-    this.progressBarAttributes = {
+    this.progressBarContainerStyle = {
         width : '100%',
         position : 'absolute',
         height : '5px',
         bottom: '30px',
         cursor : 'pointer',
-        'background-color': 'rgba(255,255,255,0.6)'
+        
         
         
     };
@@ -84,11 +123,15 @@ Flare.VideoPlayer.prototype = {
         
         this.videoPlayer = document.createElement("div");
         this.controlBar = document.createElement("div");
-        this.progressBar = document.createElement("div");
+        this.progressBarContainer = document.createElement("div");
         this.leftControls = document.createElement("div");
         this.rightControls = document.createElement("div");
         this.controlBarInner = document.createElement("div");
         this.playButton = document.createElement("button");
+        this.progressBar = document.createElement("div");
+        this.progressBarDisplayGroup = document.createElement("div");
+        this.controlBarInner = document.createElement("div");
+        this.playProgress = document.createElement("div");
         this.settingsButton = document.createElement("svg");
         this.settingsPath = document.createElementNS('http://www.w3.org/2000/svg',"path"); 
         
@@ -102,12 +145,17 @@ Flare.VideoPlayer.prototype = {
         this.canvas = new Flare.Canvas(this);
         
 
-        this.setStyle(this.videoPlayer, this.videoPlayerAttributes);
-        this.setStyle(this.controlBar, this.controlBarAttributes);
-        this.setStyle(this.playButton, this.playButtonAttributes);
-        this.setStyle(this.progressBar, this.progressBarAttributes);
-        this.setStyle(this.leftControls, this.leftControlsAttributes);
-        this.setStyle(this.rightControls, this.rightContolsAttributes)
+        this.setStyle(this.videoPlayer, this.videoPlayerStyle);
+        this.setStyle(this.controlBar, this.controlBarStyle);
+        this.setStyle(this.playButton, this.playButtonStyle);
+        this.setStyle(this.progressBarContainer, this.progressBarContainerStyle);
+        this.setStyle(this.leftControls, this.leftControlsStyle);
+        this.setStyle(this.rightControls, this.rightControlsStyle);
+        this.setStyle(this.progressBar, this.progressBarStyle);
+        this.setStyle(this.progressBarDisplayGroup, this.progressBarDisplayGroupStyle);
+        this.setStyle(this.playProgress, this.playProgressStyle);
+        
+        this.setAttributes(this.progressBar, this.progressBarAttribtues);
         
         this.settingsButton.appendChild(this.settingsPath);
         this.videoPlayer.appendChild(this.canvas.getCanvas()); 
@@ -115,12 +163,17 @@ Flare.VideoPlayer.prototype = {
         this.controlBarInner.appendChild(this.rightControls);
         this.leftControls.appendChild(this.playButton);
         this.rightControls.appendChild(this.settingsButton);
-        this.controlBar.appendChild(this.progressBar);
+        this.progressBarContainer.appendChild(this.progressBar);
+        this.progressBar.appendChild(this.progressBarDisplayGroup);
+        this.progressBarDisplayGroup.appendChild(this.playProgress);
+        this.controlBar.appendChild(this.progressBarContainer);
         this.controlBar.appendChild(this.controlBarInner);
         
         
         
         this.videoPlayer.appendChild(this.controlBar);
+        
+        this.updatePlayProgress(0.4);
         
         
         
@@ -151,9 +204,10 @@ Flare.VideoPlayer.prototype = {
     
 
     
-    update: function(frame){
+    update: function(frame , frameNumber){
     
         this.canvas.render(frame);
+        this.updatePlayProgress((frameNumber)/150)
         
     },
     
@@ -164,6 +218,19 @@ Flare.VideoPlayer.prototype = {
         }
         
 
+    },
+    
+    setAttributes: function(element, attributes){
+        
+        for (var attribute in attributes){
+            element.setAttribute(attribute, attributes[attribute]);
+        }
+    },
+    
+    
+    
+    updatePlayProgress: function (progress){
+        this.playProgress.style.setProperty("transform", "scaleX(" + progress + ")");
     }
     
     
