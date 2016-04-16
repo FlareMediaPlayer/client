@@ -14,39 +14,22 @@ Flare.Device = function() {
      * @protected
      */
     this.initialized = false;
-    /* Device need to check if the browser can do websocket
-     - Is it touch ?
-     - Make a handler to get DOM info so we can tell if the video is in the view port and stuff like that
-    */
-
+    /* Make a handler to get DOM info so we can tell if the video is in the view port and stuff like that */
+    this.isCompatible = false;
     //  Features
     this.hasCanvas = false;
     this.hasWebGL = false;
     this.hasFile = false;
-    //this.hasFileSystem = false;
     this.hasLocalStorage = false;
-    this.hasCss3D = false;
-    //this.hasPointerLock = false;
+    //this.hasCss3D = false;
     this.hasTypedArray = false;
-    //this.hasVibration = false;
-
     //  Input
     this.hasTouch = false;
-    //this.hasMousePointer = false;
-    //this.hasWheelEvent = null;
-
     //  Audio
-    //this.hasAudioData = false;
     this.hasWebAudio = false;
-
     // Device features
-    this.littleEndian = false;
-    this.bigEndian = false;
     this.fullscreen = false;
     this.webSocket = false;
-
-
-
 };
 
 
@@ -145,27 +128,17 @@ Flare.Device._initialize = function() {
     this.hasCanvas = supportsCanvas();
     this.hasWebGL = supportsWebGL();
     this.hasFile = supportsInputFile();
-    //this.hasFileSystem = false; // ??
     this.hasLocalStorage = supportsHTML5Storage();
     //this.hasCss3D = supportsCss3D();
-    //this.hasPointerLock = false;
     this.hasTypedArray = 'ArrayBuffer' in window;
-    //this.hasVibration = false;
-
     //  Input
     this.hasTouch = isTouch();
-    // this.hasMousePointer = false; Why do we need this? 
-    //this.hasWheelEvent = null;
-
     //  Audio
-    //this.hasAudioData = false;
     this.hasWebAudio = supportsWebAudio();
-
     // Device features
-    this.littleEndian = false;
-    this.bigEndian = false;
     this.webSocket = supportsWebSocket();
     this.fullscreen = supportsFullscreen();
+    this.isCompatible = this.hasCanvas && this.webSocket && this.hasWebAudio;
 };
 
 Flare.Device.whenReady = function(callback, context) {
@@ -199,7 +172,6 @@ Flare.Device.whenReady = function(callback, context) {
         }
     }
 };
-
 
 Flare.Device._readyCheck = function() {
 
