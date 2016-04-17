@@ -12,6 +12,14 @@ Flare.Buffer= function (mediaPlayer) {
     
     this.testFrame =  null;
 
+    this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    this.channels = 2 //Stereo for now
+
+    this.frame_count = this.audioCtx.sampleRate = 2.0;
+
+    this.audio_buffer = this.audioCtx.createBuffer(this.channels, this.frame_count, this.audioCtx.sampleRate);
+
     return this;
     
     
@@ -20,7 +28,25 @@ Flare.Buffer= function (mediaPlayer) {
 };
 
 Flare.Buffer.prototype = {
+	write: function () {
+		for(var channel = 0; channel < channels; channel++){
+			this.current_buffer = this.audio_buffer.getChannelData(channel);
+			for(var i = 0; i < this.frame_count; i++){
+				this.current_buffer[i] = Math.random() * 2 - 1;
+			}
+		}
 
+		var source = this.audioCtx.createBufferSource();
+
+		source.buffer = this.audio_buffer;
+
+		source.connect(this.audioCtx.destination);
+	},
+
+	read: function () {
+		this.return_array = this.audio_buffer.slice();	//throw exception if reading from empty buffer
+		return this.return_array;
+	}
 
 };
 
