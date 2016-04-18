@@ -67,7 +67,15 @@ Flare.AudioEngine.prototype = {
             this.mute.id = "deactivated";
             this.mute.innerHTML = "Mute";
         }
+    },
+
+    changeVolume: function(rangeElement) {
+      var volume = element.value;
+      var portion = parseInt(volume) / parseInt(element.max);
+
+      this.gainNode.gain.value = portion * portion;
     }
+
 
 };
 

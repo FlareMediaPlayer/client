@@ -17,6 +17,7 @@ Flare.Device = function() {
     /* Make a handler to get DOM info so we can tell if the video is in the view port and stuff like that */
     this.isCompatible = false;
     //  Features
+    this.hasGeneralInputTypes = false;
     this.hasCanvas = false;
     this.hasWebGL = false;
     this.hasFile = false;
@@ -100,14 +101,14 @@ Flare.Device._initialize = function() {
         return ('ontouchstart' in window) && (window.navigator.MaxTouchPoints > 0);
     }
 
-    function supportsInputFile() {
+    function supportsInput(type) {
         try {
-            var inputElement = document.createElement("input");
-            inputElement.setAttribute("type", "file");
+            var input = document.createElement('input');
+            input.setAttribute("type", type);
         } catch (e) {
             return false;
         }
-        return inputElement.type !== "text"; // If type = text, the web browser didn't make  <input>
+        return input.type !== "text";
     }
 
     function supportsFullscreen() {
@@ -124,10 +125,10 @@ Flare.Device._initialize = function() {
     }
 
     /** Variable initialization     */
-    
+
     this.hasCanvas = supportsCanvas();
     this.hasWebGL = supportsWebGL();
-    this.hasFile = supportsInputFile();
+    this.hasFile = supportsInput("file");
     this.hasLocalStorage = supportsHTML5Storage();
     //this.hasCss3D = supportsCss3D();
     this.hasTypedArray = 'ArrayBuffer' in window;
@@ -138,7 +139,10 @@ Flare.Device._initialize = function() {
     // Device features
     this.webSocket = supportsWebSocket();
     this.fullscreen = supportsFullscreen();
-    this.isCompatible = this.hasCanvas && this.webSocket && this.hasWebAudio;
+    var range = supportsInput("range");
+    this.hasGeneralInputTypes = range; // Can do hasFile too
+    this.isCompatible = this.hasCanvas && this.hasGeneralInputTypes
+        && this.webSocket && this.hasWebAudio;
 };
 
 Flare.Device.whenReady = function(callback, context) {
