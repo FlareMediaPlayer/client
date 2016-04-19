@@ -21,6 +21,29 @@ Flare.VideoPlayer= function (mediaPlayer) {
     this.progressBar;
     this.progressBarDisplayGroup;
     this.playProgress;
+    this.timeDisplay;
+    this.volumeControl;
+    this.muteButton;
+    
+    this.muteButtonStyle = {
+        background : 'none',
+        border : 'none',
+        color : 'white'
+    };
+    
+    this.volumeControlStyle = {
+      display: 'inline-block'
+        
+    };
+    
+    this.timeDisplayStyle = {
+      display : 'inline-block'  ,
+      padding: '0 5px',
+      'line-height' : '30px',
+      color : 'rgba(255,255,255,0.95)',
+      'font-family' : 'Verdana, Geneva, sans-serif',
+      'font-size' :'12px'
+    };
     
     this.playProgressStyle = {
         position: 'absolute',
@@ -101,7 +124,8 @@ Flare.VideoPlayer= function (mediaPlayer) {
         'font-size': '20px',
         background : 'transparent',
         border : 'none',
-        cursor: 'pointer'
+        cursor: 'pointer',
+        width: '30px'
         
     };
     
@@ -133,10 +157,13 @@ Flare.VideoPlayer.prototype = {
         this.rightControls = document.createElement("div");
         this.controlBarInner = document.createElement("div");
         this.playButton = document.createElement("button");
+        this.muteButton = document.createElement("button");
+        this.volumeControl = document.createElement("div");
         this.progressBar = document.createElement("div");
         this.progressBarDisplayGroup = document.createElement("div");
         this.controlBarInner = document.createElement("div");
         this.playProgress = document.createElement("div");
+        this.timeDisplay = document.createElement("div");
         this.settingsButton = document.createElement("svg");
         this.settingsPath = document.createElementNS('http://www.w3.org/2000/svg',"path"); 
         
@@ -145,6 +172,7 @@ Flare.VideoPlayer.prototype = {
         this.videoPlayer.id = "videoId";
         
         this.playButton.innerHTML = "&#x025B8;";
+        this.muteButton.innerHTML = "&#9732;";
         
 
         this.canvas = new Flare.Canvas(this);
@@ -159,6 +187,9 @@ Flare.VideoPlayer.prototype = {
         this.setStyle(this.progressBar, this.progressBarStyle);
         this.setStyle(this.progressBarDisplayGroup, this.progressBarDisplayGroupStyle);
         this.setStyle(this.playProgress, this.playProgressStyle);
+        this.setStyle(this.timeDisplay, this.timeDisplayStyle);
+        this.setStyle(this.volumeControl, this.volumeControlStyle);
+        this.setStyle(this.muteButton, this.muteButtonStyle);
         
         this.setAttributes(this.progressBar, this.progressBarAttribtues);
         
@@ -166,7 +197,10 @@ Flare.VideoPlayer.prototype = {
         this.videoPlayer.appendChild(this.canvas.getCanvas()); 
         this.controlBarInner.appendChild(this.leftControls);
         this.controlBarInner.appendChild(this.rightControls);
+        this.volumeControl.appendChild(this.muteButton);
         this.leftControls.appendChild(this.playButton);
+        this.leftControls.appendChild(this.volumeControl);
+        this.leftControls.appendChild(this.timeDisplay);
         this.rightControls.appendChild(this.settingsButton);
         this.progressBarContainer.appendChild(this.progressBar);
         this.progressBar.appendChild(this.progressBarDisplayGroup);
@@ -217,7 +251,8 @@ Flare.VideoPlayer.prototype = {
     update: function(frame , frameNumber){
     
         this.canvas.render(frame);
-        this.updatePlayProgress((frameNumber)/150)
+        this.updatePlayProgress((frameNumber)/150);
+        this.updateTimeDisplay();
         
     },
     
@@ -259,11 +294,20 @@ Flare.VideoPlayer.prototype = {
     
     handleDrag: function(e){
         
-        //Continuously calculate position and update
+        //Make new indicator to show the drag location
+        
+        //First get position of cursor depending on location
+        
+        //Calculate percentage
+        
+        //Now set the valuenow to the % progress
         
     },
     
     handleDragEnd: function(e){
+        
+        //if in play mode, continue playing from new location
+        //buffer if neccessary
         
     },
     
@@ -277,6 +321,10 @@ Flare.VideoPlayer.prototype = {
             this.playButton.innerHTML = "&#x025B8;";
         }
         
+    },
+    
+    updateTimeDisplay: function(){
+        this.timeDisplay.innerHTML = "0.24 / 0.33"
     }
     
     
