@@ -94,21 +94,7 @@ Flare.MediaPlayer.prototype = {
         //this.canvas.addToDOM();
 
 
-        //FOR TESTING ONLY
-        this.frames = [152];
-        var fileNum;
-        for(var f = 0 ; f< 152; f++){
-            this.frames[f] = new Image(960,540);
-            if(f  < 10 ) {
-                fileNum = "00" + f;
-            }else if (f < 100){
-                fileNum = "0" + f;
-            }else{
-                fileNum = f;
-            }
-            this.frames[f].src = './testVideo/frame' + fileNum + '.jpg';
-        }
-        //END TESTING
+
         
         this.videoPlayer.boot();
         //Okay now start the oscillator
