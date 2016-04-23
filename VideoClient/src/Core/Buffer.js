@@ -20,6 +20,14 @@ Flare.Buffer= function (mediaPlayer) {
 
     this.audio_buffer = this.audioCtx.createBuffer(this.channels, this.frame_count, this.audioCtx.sampleRate);
 
+    this.frameBuffer;
+    
+    this.frameCount;
+    
+    this.framesLoaded = 0;
+    
+    this.initFrameBuffer(152); // move this to init video task
+    
     return this;
     
     
@@ -46,7 +54,32 @@ Flare.Buffer.prototype = {
 	read: function () {
 		this.return_array = this.audio_buffer.slice();	//throw exception if reading from empty buffer
 		return this.return_array;
-	}
+	},
+        
+        initFrameBuffer: function(_frameCount){
+            
+            this.frameBuffer = new Array(_frameCount);
+            this.frameCount = _frameCount;
+            
+        },
+        
+        getFrameAt : function(index){
+            
+            return this.frameBuffer[index];
+            
+        },
+        
+        setFrameAt : function (index, frame){
+            
+            this.frameBuffer[index] = frame;
+            this.framesLoaded++;
+            
+            if(this.frameCount == this.framesLoaded){
+                console.log("doneLoading");
+            }
+            
+            
+        }
 
 };
 

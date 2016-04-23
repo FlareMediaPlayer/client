@@ -40,7 +40,7 @@ Flare.InitializeVideoTask.prototype.process = function() {
     var dataLength = this.dataView.getInt32(1);
     var videoIsAvailable = this.dataView.getInt8(5);
     console.log("the video you requested is " + this.mediaPlayer.options.videoPath);
-    console.log(videoIsAvailable);
+    //console.log(videoIsAvailable);
     
     if(videoIsAvailable === 1){
        this.videoIsAvailable = true; 

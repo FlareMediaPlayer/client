@@ -68,12 +68,17 @@ Flare.NetworkManager.prototype = {
             //All incoming binary should be images
             //console.log(message);
             var dataView = new DataView(message.data);
-            var opCode = dataView.getInt8(0);
+            var opCode = dataView.getInt8(4);
+            var dataLength = dataView.getUint32(0);
+            //console.log("lenth " + dataLength);
+            console.log("opCode " + opCode);
+            
             
             var task = new Flare.TaskTable[opCode];
             task.setData(message.data);
             task.setMediaPlayer(this.mediaPlayer);
             task.process();
+            
             
             
             /*
