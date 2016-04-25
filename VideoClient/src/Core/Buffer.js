@@ -26,6 +26,8 @@ Flare.Buffer= function (mediaPlayer) {
     
     this.framesLoaded = 0;
     
+    this.audioData = null;
+    
     this.initFrameBuffer(152); // move this to init video task
     
     return this;
@@ -79,6 +81,15 @@ Flare.Buffer.prototype = {
             }
             
             
+        },
+        
+        setAudioData : function(data){
+            this.audioData = data;
+            console.log(this.audioData);
+        },
+        
+        getAudioSource : function(){
+            return this.audioData;
         }
 
 };

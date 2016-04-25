@@ -35,7 +35,7 @@ Flare.MediaPlayer = function (userOptions) {
     this.isBooted = null;
     this.oscillator = null;
     this.videoPlayer = null;
-    
+    this.audioEngine = null;
     this.buffer = null;
     
     this.isPlaying = false;
@@ -83,6 +83,7 @@ Flare.MediaPlayer.prototype = {
         this.oscillator = new Flare.Oscillator(this);
         this.clock = new Flare.Clock(this);
         this.buffer = new Flare.Buffer(this);
+        this.audioEngine = new Flare.AudioEngine(this);
         this._networkManager = new Flare.NetworkManager(this);
         //this._networkManager.requestVideo(this.options.videoPath);
         
@@ -97,6 +98,7 @@ Flare.MediaPlayer.prototype = {
 
         
         this.videoPlayer.boot();
+        this.audioEngine.boot();
         //Okay now start the oscillator
         this.clock.boot();
         this.oscillator.run();
@@ -137,6 +139,7 @@ Flare.MediaPlayer.prototype = {
         }
         else {
             this.isPlaying = true;
+            this.audioEngine.playSound(0);
         }
     },
     
