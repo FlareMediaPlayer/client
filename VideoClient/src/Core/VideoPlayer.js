@@ -24,6 +24,7 @@ Flare.VideoPlayer= function (mediaPlayer) {
     this.timeDisplay;
     this.volumeControl;
     this.muteButton;
+	this.seekslider;
     
     this.muteButtonStyle = {
         background : 'none',
@@ -77,12 +78,12 @@ Flare.VideoPlayer= function (mediaPlayer) {
     };
     
     this.progressBarAttribtues = {
-        role: 'slider',
+        type: 'range',
         draggable: 'true',
-        'aria-valuemin' : 0,
-        'aria-valuemax' : 100,
-        'aria-valuenow' : 0,
-        //'tabindex' : 0
+        min:"0",
+		max:"100",
+		value:"0",
+		step:"1"
         
     };
     
@@ -139,6 +140,8 @@ Flare.VideoPlayer= function (mediaPlayer) {
         
         
     };
+	
+	
     
     return this;
     
@@ -159,7 +162,7 @@ Flare.VideoPlayer.prototype = {
         this.playButton = document.createElement("button");
         this.muteButton = document.createElement("button");
         this.volumeControl = document.createElement("div");
-        this.progressBar = document.createElement("div");
+        this.progressBar = document.createElement("input");
         this.progressBarDisplayGroup = document.createElement("div");
         this.controlBarInner = document.createElement("div");
         this.playProgress = document.createElement("div");
