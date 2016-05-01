@@ -5,7 +5,7 @@ Flare.AudioEngine = function(mediaPlayer) {
      * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
      */
     this.mediaPlayer = mediaPlayer;
-    this.audioCtx = null; //Remeber to check device.isCompatible
+    //Remember to check device.isCompatible
     this.mute;
     this.source = null;
 
@@ -20,55 +20,51 @@ Flare.AudioEngine = function(mediaPlayer) {
 
 Flare.AudioEngine.prototype = {
     boot: function() {
-        this.audioCtx = new(window.AudioContext || window.webkitAudioContext)();
         //this.mute = document.querySelector('.muteButton');
 
-        //this.analyser = audioCtx.createAnalyser();
-        //this.distortion = audioCtx.createWaveShaper();
-        this.gainNode = this.audioCtx.createGain();
-        //this.biquadFilter = audioCtx.createBiquadFilter();
-        this.source = this.audioCtx.createBufferSource();
+        this.gainNode = this.mediaPlayer.audioCtx.createGain();
         this.playing = false;
-        //this.source.buffer = this.buffer.getAudioSource();//Buffer.read Waiting for Jens to finish is buffering
 
     },
-    
-    init: function (){
+
+    createNewBufferSource: function() {
         //this.source.buffer = this.mediaPlayer.buffer.getAudioSource();//Buffer.read Waiting for Jens to finish is buffering
-        
-        this.audioCtx.decodeAudioData(this.mediaPlayer.buffer.getAudioSource(), function (decodedBuffer) {
+
+        this.source = this.mediaPlayer.audioCtx.createBufferSource();
+        this.mediaPlayer.audioCtx.decodeAudioData(this.mediaPlayer.buffer.getAudioSource(), function(decodedBuffer) {
             this.source.buffer = decodedBuffer;
             console.log("done loading buffer");
             this.source.connect(this.gainNode);
-            this.gainNode.connect(this.audioCtx.destination);
-        }. bind(this));
-        
-       
+            this.gainNode.connect(this.mediaPlayer.audioCtx.destination);
+        }.bind(this));
+
+
 
     },
-    
-    connectBuffer: function(decodedBuffer){
-            this.source.buffer = decodedBuffer;
-            console.log("done loading buffer");
-            this.source.connect(this.gainNode);
-            this.gainNode.connect(this.audioCtx.destination);
+
+    connectBuffer: function(decodedBuffer) {
+        this.source.buffer = decodedBuffer;
+        console.log("done loading buffer");
+        this.source.connect(this.gainNode);
+        this.gainNode.connect(this.mediaPlayer.audioCtx.destination);
     },
 
     playSound: function(time) {
-        
-        /*
+
+        this.createNewBufferSource();
+
         if (!this.source.start) //If the browser does not support web audio
-          this.source.start = source.noteOn;
-        */
+            this.source.start = source.noteOn;
+
         this.source.start(time);
         this.playing = true;
     },
 
     stopSound: function(time) {
-        /*
-          if(!this.source.stop)
+
+        if (!this.source.stop)
             this.source.stop = this.source.noteOff;
-        */
+
         this.source.stop(time)
         this.playing = false;
     },
@@ -91,10 +87,10 @@ Flare.AudioEngine.prototype = {
     },
 
     changeVolume: function(rangeElement) {
-      var volume = element.value;
-      var portion = parseInt(volume) / parseInt(element.max);
+        var volume = element.value;
+        var portion = parseInt(volume) / parseInt(element.max);
 
-      this.gainNode.gain.value = portion * portion;
+        this.gainNode.gain.value = portion * portion;
     }
 
 

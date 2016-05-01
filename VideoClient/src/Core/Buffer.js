@@ -12,19 +12,18 @@ Flare.Buffer= function (mediaPlayer) {
     
     this.testFrame =  null;
 
-    this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
     this.channels = 2 //Stereo for now
 
-    this.frame_count = this.audioCtx.sampleRate = 2.0;
+    this.frame_count = this.mediaPlayer.audioCtx.sampleRate = 2.0;
 
-    this.audio_buffer = this.audioCtx.createBuffer(this.channels, this.frame_count, this.audioCtx.sampleRate);
+    this.audio_buffer = this.mediaPlayer.audioCtx.createBuffer(this.channels, this.frame_count, this.mediaPlayer.audioCtx.sampleRate);
 
     this.frameBuffer;
     
     this.frameCount;
     
     this.framesLoaded = 0;
+    this.isLoaded = false;
     
     this.audioData = null;
     
@@ -46,11 +45,11 @@ Flare.Buffer.prototype = {
 			}
 		}
 
-		var source = this.audioCtx.createBufferSource();
+		var source = this.mediaPlayer.audioSource;
 
 		source.buffer = this.audio_buffer;
 
-		source.connect(this.audioCtx.destination);
+		source.connect(this.mediaPlayer.audioCtx.destination);
 	},
 
 	read: function () {
@@ -77,10 +76,11 @@ Flare.Buffer.prototype = {
             this.framesLoaded++;
             
             if(this.frameCount == this.framesLoaded){
-                console.log("doneLoading");
+                this.isLoaded = true;
+                this.mediaPlayer.videoPlayer.toggleLockingButtons(); // locking all buttons in mediaplayer
+                this.mediaPlayer.videoPlayer.removeLoadingBar();
+                console.log("buffer doneLoading");
             }
-            
-            
         },
         
         setAudioData : function(data){

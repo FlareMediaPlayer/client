@@ -1,10 +1,9 @@
-
-Flare.VideoPlayer= function (mediaPlayer) {
+Flare.VideoPlayer = function(mediaPlayer) {
 
 
     /**
-    * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
-    */
+     * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
+     */
     this.mediaPlayer = mediaPlayer;
     this.canvas = null;
     this.videoWidth;
@@ -24,133 +23,146 @@ Flare.VideoPlayer= function (mediaPlayer) {
     this.timeDisplay;
     this.volumeControl;
     this.muteButton;
-    
+    this.loadingBar;
+    this.buttonsLocked = false;
+
     this.muteButtonStyle = {
-        background : 'none',
-        border : 'none',
-        color : 'white'
+        background: 'none',
+        border: 'none',
+        color: 'white'
     };
-    
+
     this.volumeControlStyle = {
-      display: 'inline-block'
-        
+        display: 'inline-block'
+
     };
-    
+
     this.timeDisplayStyle = {
-      display : 'inline-block'  ,
-      padding: '0 5px',
-      'line-height' : '30px',
-      color : 'rgba(255,255,255,0.95)',
-      'font-family' : 'Verdana, Geneva, sans-serif',
-      'font-size' :'12px'
+        display: 'inline-block',
+        padding: '0 5px',
+        'line-height': '30px',
+        color: 'rgba(255,255,255,0.95)',
+        'font-family': 'Verdana, Geneva, sans-serif',
+        'font-size': '12px'
     };
-    
+
     this.playProgressStyle = {
         position: 'absolute',
-        bottom : 0,
+        bottom: 0,
         left: '0px',
-        'background-color':'rgba(0,0,255,0.7)',
-        height : '100%',
-        width : '100%',
-        'transform-origin' : '0 0 '
-        
+        'background-color': 'rgba(0,0,255,0.7)',
+        height: '100%',
+        width: '100%',
+        'transform-origin': '0 0 '
+
     };
-    
+
     this.progressBarDisplayGroupStyle = {
         height: '100%',
         //transform: 'scaleY(0.5)',
         transition: 'transform .1s cubic-bezier(0.4,0.0,1,1)',
         'background-color': 'rgba(255,255,255,0.6)',
-        'transform-origin' : 'bottom'
-        
-        
+        'transform-origin': 'bottom'
+
+
     };
-    
-    this.progressBarStyle={
-        position : 'absolute',
-        bottom : 0,
-        left : 0,
-        width : '100%',
-        height : '100%',
-        'touch-action' : 'none'
-        
+
+    this.progressBarStyle = {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        'touch-action': 'none'
+
     };
-    
+
     this.progressBarAttribtues = {
         role: 'slider',
         draggable: 'true',
-        'aria-valuemin' : 0,
-        'aria-valuemax' : 100,
-        'aria-valuenow' : 0,
+        'aria-valuemin': 0,
+        'aria-valuemax': 100,
+        'aria-valuenow': 0,
         //'tabindex' : 0
-        
+
     };
-    
+
     this.rightControlsStyle = {
-        float : 'right',
+        float: 'right',
         height: '100%'
     };
-    
-    
-    
+
+
+
     this.leftControlsStyle = {
-        float : 'left',
-        height : '100%'
+        float: 'left',
+        height: '100%'
     };
-    
+
     this.videoPlayerStyle = {
-      position: 'relative',
-      overflow: 'hidden',
-      width: '960px',
-      height: '540px'
-      
+        position: 'relative',
+        overflow: 'hidden',
+        width: '960px',
+        height: '540px'
+
     };
-    
+
     this.controlBarInnerStyle = {
-        
+
     };
-    
+
     this.controlBarStyle = {
         height: '30px',
         position: 'absolute',
         bottom: '0',
-        left: 0 ,
-        right: 0 ,
+        left: 0,
+        right: 0,
         'background-color': 'rgba(0,0,0,0.5)'
     };
-    
+
     this.playButtonStyle = {
         color: 'white',
         'font-size': '20px',
-        background : 'transparent',
-        border : 'none',
+        background: 'transparent',
+        border: 'none',
         cursor: 'pointer',
         width: '30px'
-        
+
     };
-    
+
     this.progressBarContainerStyle = {
-        width : '100%',
-        position : 'absolute',
-        height : '5px',
+        width: '100%',
+        position: 'absolute',
+        height: '5px',
         bottom: '30px',
-        cursor : 'pointer',
-        
-        
-        
+        cursor: 'pointer'
     };
-    
+
+    this.loadingBarStyle = {
+        position: 'absolute',
+        left: '40%',
+        top: '30%',
+        right: '0px',
+        bottom: '0px',
+        width: '100%',
+        height: '100%',
+        'z-index': '99',
+        background: "url('../src/images/page-loader.gif')",
+        'background-repeat': 'no-repeat'
+    };
+
     return this;
-    
-    
-    
+
+
+
 };
 
 Flare.VideoPlayer.prototype = {
-    
-    boot: function(){
-        
+
+    boot: function() {
+
         this.videoPlayer = document.createElement("div");
+        this.loadingBar = document.createElement("div");
         this.controlBar = document.createElement("div");
         this.progressBarContainer = document.createElement("div");
         this.leftControls = document.createElement("div");
@@ -165,18 +177,18 @@ Flare.VideoPlayer.prototype = {
         this.playProgress = document.createElement("div");
         this.timeDisplay = document.createElement("div");
         this.settingsButton = document.createElement("svg");
-        this.settingsPath = document.createElementNS('http://www.w3.org/2000/svg',"path"); 
-        
-        
+        this.settingsPath = document.createElementNS('http://www.w3.org/2000/svg', "path");
+
+
         this.settingsPath.setAttributeNS(null, "d", Flare.Icons.settings);
         this.videoPlayer.id = "videoId";
-        
+
         this.playButton.innerHTML = "&#x025B8;";
         this.muteButton.innerHTML = "&#9732;";
-        
+
 
         this.canvas = new Flare.Canvas(this);
-        
+
 
         this.setStyle(this.videoPlayer, this.videoPlayerStyle);
         this.setStyle(this.controlBar, this.controlBarStyle);
@@ -190,11 +202,12 @@ Flare.VideoPlayer.prototype = {
         this.setStyle(this.timeDisplay, this.timeDisplayStyle);
         this.setStyle(this.volumeControl, this.volumeControlStyle);
         this.setStyle(this.muteButton, this.muteButtonStyle);
-        
+        this.setStyle(this.loadingBar, this.loadingBarStyle);
+
         this.setAttributes(this.progressBar, this.progressBarAttribtues);
-        
+
         this.settingsButton.appendChild(this.settingsPath);
-        this.videoPlayer.appendChild(this.canvas.getCanvas()); 
+        this.videoPlayer.appendChild(this.canvas.getCanvas());
         this.controlBarInner.appendChild(this.leftControls);
         this.controlBarInner.appendChild(this.rightControls);
         this.volumeControl.appendChild(this.muteButton);
@@ -207,128 +220,154 @@ Flare.VideoPlayer.prototype = {
         this.progressBarDisplayGroup.appendChild(this.playProgress);
         this.controlBar.appendChild(this.progressBarContainer);
         this.controlBar.appendChild(this.controlBarInner);
-        
+
         //BIND HANDLERS
         this.progressBar.onmousedown = this.handleMouseDown.bind(this);
         this.progressBar.ondragstart = this.handleDragStart.bind(this);
         this.progressBar.ondrag = this.handleDrag.bind(this);
         this.progressBar.ondragend = this.handleDragEnd.bind(this);
         this.playButton.onclick = this.handlePlayButtonPress.bind(this);
-        
-        this.videoPlayer.appendChild(this.controlBar);
-        
-        this.updatePlayProgress(0.4);
-        
-        
-        
-        var target;
-        var parent = null;//this.mediaPlayer.parent;
 
-        
-        if (parent)
-        {
-            if (typeof parent === 'string')
-            {
+
+        this.videoPlayer.appendChild(this.controlBar);
+        this.videoPlayer.appendChild(this.loadingBar);
+        if (!this.mediaPlayer.buffer.isLoaded) {
+            this.toggleLockingButtons();
+        }
+
+
+        this.updatePlayProgress(0.4);
+
+
+
+        var target;
+        var parent = null; //this.mediaPlayer.parent;
+
+
+        if (parent) {
+            if (typeof parent === 'string') {
                 target = document.getElementById(parent);
-            } else if (typeof parent === 'object' && parent.nodeType === 1)
-            {
+            } else if (typeof parent === 'object' && parent.nodeType === 1) {
                 target = parent;
             }
         }
-        
+
         // Fallback, covers an invalid ID and a non HTMLelement object
-        if (!target){
-            
+        if (!target) {
+
             target = document.body;
         }
-        
-        
+
         target.appendChild(this.videoPlayer);
     },
-    
 
-    
-    update: function(frame , frameNumber){
-    
+
+
+    update: function(frame, frameNumber) {
+
         this.canvas.render(frame);
-        this.updatePlayProgress((frameNumber)/150);
+        this.updatePlayProgress((frameNumber) / 150);
         this.updateTimeDisplay();
-        
+
     },
-    
-    setStyle : function(element, attributes){
-        
-        for (var attribute in attributes){
+
+    setStyle: function(element, attributes) {
+
+        for (var attribute in attributes) {
             element.style.setProperty(attribute, attributes[attribute]);
         }
-        
+
 
     },
-    
-    setAttributes: function(element, attributes){
-        
-        for (var attribute in attributes){
+
+    setAttributes: function(element, attributes) {
+
+        for (var attribute in attributes) {
             element.setAttribute(attribute, attributes[attribute]);
         }
     },
-    
-    
-    
-    updatePlayProgress: function (progress){
+
+
+
+    updatePlayProgress: function(progress) {
         this.playProgress.style.setProperty("transform", "scaleX(" + progress + ")");
-        this.progressBar.setAttribute("aria-valuenow" , parseInt(progress*100));
+        this.progressBar.setAttribute("aria-valuenow", parseInt(progress * 100));
     },
-    
-    handleMouseDown:function (e){
+
+    handleMouseDown: function(e) {
         var currentProgress = parseInt(this.progressBar.getAttribute('aria-valuenow'));
         this.mediaPlayer.isPlaying = false;
-        
+
         return false;
     },
-    
-    handleDragStart: function(e){
-        
+
+    handleDragStart: function(e) {
+
         console.log("currentProgress" + currentProgress);
-        
+
     },
-    
-    handleDrag: function(e){
-        
+
+    handleDrag: function(e) {
+
         //Make new indicator to show the drag location
-        
+
         //First get position of cursor depending on location
-        
+
         //Calculate percentage
-        
+
         //Now set the valuenow to the % progress
-        
+
     },
-    
-    handleDragEnd: function(e){
-        
+
+    handleDragEnd: function(e) {
+
         //if in play mode, continue playing from new location
         //buffer if neccessary
-        
+
     },
-    
-    handlePlayButtonPress: function(e){
+
+    handlePlayButtonPress: function(e) {
         console.log("play clicked");
         this.mediaPlayer.togglePlay();
-        
-        if(this.mediaPlayer.isPlayMode()){
+
+        if (this.mediaPlayer.isPlayMode()) {
             this.playButton.innerHTML = "||";
-        }else{
+        } else {
             this.playButton.innerHTML = "&#x025B8;";
         }
-        
+
     },
-    
-    updateTimeDisplay: function(){
+
+    updateTimeDisplay: function() {
         this.timeDisplay.innerHTML = "0.24 / 0.33"
+    },
+
+    removeLoadingBar: function(){
+        this.videoPlayer.removeChild(this.loadingBar);
+    },
+
+    toggleLockingButtons: function() {
+        if (this.buttonsLocked) {
+            this.playButton.removeAttribute("disabled");
+            this.muteButton.removeAttribute("disabled");
+            this.volumeControl.removeAttribute("disabled");
+            this.progressBar.removeAttribute("disabled");
+            this.settingsButton.removeAttribute("disabled");
+
+            this.buttonsLocked = false;
+        } else { // lock buttons
+            this.playButton.setAttribute("disabled", "disabled");
+            this.muteButton.setAttribute("disabled", "disabled");
+            this.volumeControl.setAttribute("disabled", "disabled");
+            this.progressBar.setAttribute("disabled", "disabled");
+            this.settingsButton.setAttribute("disabled", "disabled");
+            this.buttonsLocked = true;
+        }
     }
-    
-    
-    
+
+
+
+
 
 };
 
