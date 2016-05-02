@@ -21,6 +21,8 @@ Flare.Buffer= function (mediaPlayer) {
     this.frameBuffer;
     
     this.frameCount;
+
+    this.frameRate;
     
     this.framesLoaded = 0;
     this.isLoaded = false;
@@ -57,10 +59,11 @@ Flare.Buffer.prototype = {
 		return this.return_array;
 	},
         
-        initFrameBuffer: function(_frameCount){
+        initFrameBuffer: function(_frameCount, _frameRate){
             
             this.frameBuffer = new Array(_frameCount);
             this.frameCount = _frameCount;
+            this.frameRate = _frameRate
             
         },
         

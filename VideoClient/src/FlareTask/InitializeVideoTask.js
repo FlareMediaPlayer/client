@@ -43,7 +43,8 @@ Flare.InitializeVideoTask.prototype.process = function() {
     //console.log(videoIsAvailable);
     
     if(videoIsAvailable === 1){
-       this.videoIsAvailable = true; 
+       this.videoIsAvailable = true;
+       this.mediaPlayer.buffer.initFrameBuffer(152, 30); //Swap out for dynamic buffer and frame rate later
        console.log("video is available!");
     }else{
         console.log("video is not available!");
