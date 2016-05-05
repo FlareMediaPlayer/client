@@ -8,9 +8,9 @@ Flare.MediaPlayer = function(userOptions) {
 
 
     this.options = {
-
+        videoID: '',
         container: '',
-        videoPath: '',
+        //videoPath: '',
         videoSize: Flare.CONSTANTS.VIDEO_SIZE.ORIGINAL,
         videoScale: '',
         width: 960,
@@ -60,9 +60,10 @@ Flare.MediaPlayer.prototype = {
 
     parseOptions: function(userOptions) {
         //REMEMBER TO SANITIZE USER INPUT
-        if (typeof userOptions.videoPath != 'undefined') {
+        console.log(userOptions);
+        if (typeof userOptions.videoID != 'undefined') {
 
-            this.options.videoPath = userOptions.videoPath;
+            this.options.videoID = userOptions.videoID;
 
         } else {
             console.log("location is not set");

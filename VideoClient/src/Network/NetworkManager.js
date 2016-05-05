@@ -65,6 +65,7 @@ Flare.NetworkManager.prototype = {
         
         if (message.data instanceof ArrayBuffer ){
             
+            
             //All incoming binary should be images
             //console.log(message);
             var dataView = new DataView(message.data);
@@ -146,21 +147,12 @@ Flare.NetworkManager.prototype = {
     requestVideo: function(){
         
         var videoRequest = new Flare.OpenVideoMessage();
-        videoRequest.setRequestFile(this.mediaPlayer.options.videoPath);
-        //console.log(videoRequest);
+        videoRequest.setRequestFile(this.mediaPlayer.options.videoID);
+        
         
         //console.log(videoRequest.toBinary());
         this.socket.send(videoRequest.toBinary());
         
-        /*
-        var request = {
-            opCode: Flare.CONSTANTS.NETWORK.REQUEST_VIDEO,
-            path : videoPath
-        };
-        
-        //console.log(JSON.stringify(request));
-        */
-        this.socket.send("hello");
         
         
     }

@@ -295,6 +295,7 @@ Flare.VideoPlayer.prototype = {
     },
 
     handleMouseDown: function(e) {
+        console.log(e);
         var currentProgress = parseInt(this.progressBar.getAttribute('aria-valuenow'));
         this.mediaPlayer.isPlaying = false;
 
@@ -303,7 +304,7 @@ Flare.VideoPlayer.prototype = {
 
     handleDragStart: function(e) {
 
-        console.log("currentProgress" + currentProgress);
+        console.log(e);
 
     },
 
@@ -316,6 +317,7 @@ Flare.VideoPlayer.prototype = {
         //Calculate percentage
 
         //Now set the valuenow to the % progress
+        console.log(e);
 
     },
 
