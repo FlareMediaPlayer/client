@@ -166,7 +166,7 @@ Flare.ProcessAudioTask.prototype.process = function() {
     //var audioUrl = urlCreator.createObjectURL( blob );
     
     this.mediaPlayer.buffer.setAudioData(this.data.slice(5));
-    this.mediaPlayer.audioEngine.init();
+    //this.mediaPlayer.audioEngine.init();
 
            
     
@@ -1514,8 +1514,6 @@ Flare.Clock.prototype = {
             this.time = 0;
             seconds = 0;
             this.mediaPlayer.setStartTime(Date.now()); 
-        } else {
-
         }
         if(seconds < 10){
             return this.minutes + ":0" + seconds;

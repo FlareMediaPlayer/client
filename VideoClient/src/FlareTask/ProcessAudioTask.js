@@ -47,7 +47,7 @@ Flare.ProcessAudioTask.prototype.process = function() {
     //var audioUrl = urlCreator.createObjectURL( blob );
     
     this.mediaPlayer.buffer.setAudioData(this.data.slice(5));
-    this.mediaPlayer.audioEngine.init();
+    //this.mediaPlayer.audioEngine.init();
 
            
     

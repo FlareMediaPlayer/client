@@ -84,13 +84,10 @@ Flare.Clock.prototype = {
         this.time = ((Date.now() - startTime) - pauseTime) / 1000;
         var seconds = Math.floor(this.time * 1) / 1;
         if(seconds > 59){
-            console.log(seconds); 
             this.minutes++;
             this.time = 0;
             seconds = 0;
             this.mediaPlayer.setStartTime(Date.now()); 
-        } else {
-
         }
         if(seconds < 10){
             return this.minutes + ":0" + seconds;
