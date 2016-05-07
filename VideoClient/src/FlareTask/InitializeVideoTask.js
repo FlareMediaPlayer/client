@@ -25,12 +25,17 @@ Flare.InitializeVideoTask.prototype.setData = function(data) {
     this.dataView = new DataView(this.data);
     this.flareOpCode = Flare.OpCode.OPEN_VIDEO;
     this.videoIsAvailable = false;
+
+    this.width = 0;
+    this.height = 0;
+    this.fps = 0;
+    this.duration = 0;
     
 };
 
 Flare.InitializeVideoTask.prototype.setMediaPlayer = function(mediaPlayer) {
 
-    this.mediaPlayer = mediaPlayer
+    this.mediaPlayer = mediaPlayer;
     
 };
 
@@ -44,12 +49,16 @@ Flare.InitializeVideoTask.prototype.process = function() {
     
     if(videoIsAvailable === 1){
        this.videoIsAvailable = true;
-       console.log(this.dataView.getInt32(6) + " width" );
-       console.log(this.dataView.getInt32(10) + " height " );
-       console.log(this.dataView.getFloat64(14) + " fps " );
-       console.log(this.dataView.getFloat64(22) + " duration " );
+       this.width = this.dataView.getInt32(6);
+       this.height = this.dataView.getInt32(10);
+       this.fps = this.dataView.getFloat64(14);
+       this.duration = this.dataView.getFloat64(22);
+       console.log(this.width + " width" );
+       console.log(this.height + " height " );
+       console.log(this.fps + " fps " );
+       console.log(this.duration + " duration " );
        
-       this.mediaPlayer.buffer.initFrameBuffer(152, 30); //Swap out for dynamic buffer and frame rate later
+       this.mediaPlayer.buffer.initFrameBuffer(337, this.fps); //Swap out for dynamic buffer and frame rate later
        console.log("video is available!");
     }else{
         console.log("video is not available!");

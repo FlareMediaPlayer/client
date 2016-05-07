@@ -41,6 +41,9 @@ Flare.MediaPlayer = function(userOptions) {
     this.isPlaying = false;
 
     this.testCounter = 0;
+    this.timeStarted = 0;
+    this.totalTimePaused = 0;
+    this.numPressedPlay = 0;
 
 
     /**
@@ -114,10 +117,14 @@ Flare.MediaPlayer.prototype = {
         //Finished with update, render the frame:
         //TESTING ONLY
 
+        if(this.numPressedPlay === 0){
+            this.setStartTime(Date.now());
+        }
 
         //this.canvas.render(this.frames[this.testCounter%152]);
         if (this.isPlaying) {
             //this.videoPlayer.update(this.frames[this.testCounter] , this.testCounter);
+            this.videoPlayer.updateTimeDisplay(this.clock.totalTimePlayed(this.timeStarted, this.totalTimePaused), "0:33");
 
             this.videoPlayer.update(this.buffer.getFrameAt(this.testCounter), this.testCounter);
             this.testCounter = (this.testCounter + 1) % 151;
@@ -126,18 +133,31 @@ Flare.MediaPlayer.prototype = {
         //Timing is completely messed up. Need to figure out core video engine code
     },
 
+    setStartTime: function(time) {
+        this.timeStarted = time;
+    },
+
     togglePlay: function() {
 
         if (this.isPlaying) {
             this.isPlaying = false;
+            this.clock.setPauseTime(Date.now());
         } else {
             this.isPlaying = true;
             this.audioEngine.playSound(0);
+            if(this.numPressedPlay > 0){
+                this.totalTimePaused += Date.now() - this.clock.getPauseTime();
+            }
+            this.numPressedPlay++;
         }
     },
 
     isPlayMode: function() {
         return this.isPlaying;
+    },
+
+    getNumPressedPlay: function() {
+        return this.numPressedPlay;
     }
 
 

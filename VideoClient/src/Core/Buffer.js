@@ -29,8 +29,6 @@ Flare.Buffer= function (mediaPlayer) {
     
     this.audioData = null;
     
-    this.initFrameBuffer(152); // move this to init video task
-    
     return this;
     
     

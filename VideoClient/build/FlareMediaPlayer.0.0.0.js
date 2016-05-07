@@ -72,12 +72,17 @@ Flare.InitializeVideoTask.prototype.setData = function(data) {
     this.dataView = new DataView(this.data);
     this.flareOpCode = Flare.OpCode.OPEN_VIDEO;
     this.videoIsAvailable = false;
+
+    this.width = 0;
+    this.height = 0;
+    this.fps = 0;
+    this.duration = 0;
     
 };
 
 Flare.InitializeVideoTask.prototype.setMediaPlayer = function(mediaPlayer) {
 
-    this.mediaPlayer = mediaPlayer
+    this.mediaPlayer = mediaPlayer;
     
 };
 
@@ -86,11 +91,21 @@ Flare.InitializeVideoTask.prototype.process = function() {
 
     var dataLength = this.dataView.getInt32(1);
     var videoIsAvailable = this.dataView.getInt8(5);
-    console.log("the video you requested is " + this.mediaPlayer.options.videoPath);
-    console.log(videoIsAvailable);
+    console.log("the video you requested is " + this.mediaPlayer.options.videoID);
+    //console.log(videoIsAvailable);
     
     if(videoIsAvailable === 1){
-       this.videoIsAvailable = true; 
+       this.videoIsAvailable = true;
+       this.width = this.dataView.getInt32(6);
+       this.height = this.dataView.getInt32(10);
+       this.fps = this.dataView.getFloat64(14);
+       this.duration = this.dataView.getFloat64(22);
+       console.log(this.width + " width" );
+       console.log(this.height + " height " );
+       console.log(this.fps + " fps " );
+       console.log(this.duration + " duration " );
+       
+       this.mediaPlayer.buffer.initFrameBuffer(337, this.fps); //Swap out for dynamic buffer and frame rate later
        console.log("video is available!");
     }else{
         console.log("video is not available!");
@@ -103,21 +118,225 @@ Flare.InitializeVideoTask.prototype.process = function() {
 
 Flare.InitializeVideoTask.prototype.constructor = Flare.InitializeVideoTask;
 
-Flare.AudioEngine= function (mediaPlayer) {
+Flare.ProcessAudioTask= function () {
 
 
     /**
     * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
     */
-    this.mediaPlayer = mediaPlayer;
+   
+    this.data;
+    this.dataView;
+    this.flareOpCode;
+    this.mediaPlayer;
+    
 
     return this;
     
     
     
+    
+};
+
+Flare.ProcessAudioTask.prototype.setData = function(data) {
+
+    this.data = data;
+    this.dataView = new DataView(this.data);
+    this.flareOpCode = Flare.OpCode.FRAME;
+    this.videoIsAvailable = false;
+    
+};
+
+Flare.ProcessAudioTask.prototype.setMediaPlayer = function(mediaPlayer) {
+
+    this.mediaPlayer = mediaPlayer
+    
+};
+
+
+Flare.ProcessAudioTask.prototype.process = function() {
+
+    var dataLength = this.dataView.getInt32(0);
+    
+    
+    
+    //This way is probably super slow!!!!
+    //var blob = new Blob([this.data.slice(5)], { type: 'audio/m4a' });
+    //var urlCreator = window.URL || window.webkitURL;
+    //var audioUrl = urlCreator.createObjectURL( blob );
+    
+    this.mediaPlayer.buffer.setAudioData(this.data.slice(5));
+    this.mediaPlayer.audioEngine.init();
+
+           
+    
+
+
+    
+    
+    
+};
+
+Flare.ProcessAudioTask.prototype.constructor = Flare.ProcessAudioTask;
+
+Flare.ProcessFrameTask= function () {
+
+
+    /**
+    * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
+    */
+   
+    this.data;
+    this.dataView;
+    this.flareOpCode;
+    this.mediaPlayer;
+    
+
+    return this;
+    
+    
+    
+    
+};
+
+Flare.ProcessFrameTask.prototype.setData = function(data) {
+
+    this.data = data;
+    this.dataView = new DataView(this.data);
+    this.flareOpCode = Flare.OpCode.FRAME;
+    this.videoIsAvailable = false;
+    
+};
+
+Flare.ProcessFrameTask.prototype.setMediaPlayer = function(mediaPlayer) {
+
+    this.mediaPlayer = mediaPlayer
+    
+};
+
+
+Flare.ProcessFrameTask.prototype.process = function() {
+
+    var dataLength = this.dataView.getInt32(0);
+    var index = this.dataView.getUint32(5);
+    
+    
+    //This way is probably super slow!!!!
+    var img = new Image;
+    var blob = new Blob([this.data.slice(9)], { type: 'image/jpg' });
+    var urlCreator = window.URL || window.webkitURL;
+    var imageUrl = urlCreator.createObjectURL( blob );
+    img.src = imageUrl;
+    console.log("frame " +index + "loaded");
+  
+ 
+
+           
+    this.mediaPlayer.buffer.setFrameAt(index, img);
+ 
+    
+
+
+    
+    
+    
+};
+
+Flare.ProcessFrameTask.prototype.constructor = Flare.ProcessFrameTask;
+Flare.AudioEngine = function(mediaPlayer) {
+
+
+    /**
+     * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
+     */
+    this.mediaPlayer = mediaPlayer;
+    //Remember to check device.isCompatible
+    this.mute;
+    this.source = null;
+
+    this.analyser;
+    this.distortion;
+    this.gainNode;
+    this.biquadFilter;
+    this.soundSource;
+
+    return this;
 };
 
 Flare.AudioEngine.prototype = {
+    boot: function() {
+        //this.mute = document.querySelector('.muteButton');
+
+        this.gainNode = this.mediaPlayer.audioCtx.createGain();
+        this.playing = false;
+
+    },
+
+    createNewBufferSource: function() {
+        //this.source.buffer = this.mediaPlayer.buffer.getAudioSource();//Buffer.read Waiting for Jens to finish is buffering
+
+        this.source = this.mediaPlayer.audioCtx.createBufferSource();
+        this.mediaPlayer.audioCtx.decodeAudioData(this.mediaPlayer.buffer.getAudioSource(), function(decodedBuffer) {
+            this.source.buffer = decodedBuffer;
+            console.log("done loading buffer");
+            this.source.connect(this.gainNode);
+            this.gainNode.connect(this.mediaPlayer.audioCtx.destination);
+        }.bind(this));
+
+
+
+    },
+
+    connectBuffer: function(decodedBuffer) {
+        this.source.buffer = decodedBuffer;
+        console.log("done loading buffer");
+        this.source.connect(this.gainNode);
+        this.gainNode.connect(this.mediaPlayer.audioCtx.destination);
+    },
+
+    playSound: function(time) {
+
+        this.createNewBufferSource();
+
+        if (!this.source.start) //If the browser does not support web audio
+            this.source.start = source.noteOn;
+
+        this.source.start(time);
+        this.playing = true;
+    },
+
+    stopSound: function(time) {
+
+        if (!this.source.stop)
+            this.source.stop = this.source.noteOff;
+
+        this.source.stop(time)
+        this.playing = false;
+    },
+
+    toggle: function(time) {
+        this.playing ? this.stop(time) : this.play(time);
+        this.playing = !this.playing;
+    },
+
+    muteAudio: function() {
+        if (this.mute.id != "activated") {
+            this.gainNode.gainvalue = 0; //Muting
+            this.mute.id = "activated";
+            this.mute.innerHTML = "Unmute"; //Will probably change to a different button in the mediaplayer
+        } else {
+            this.gainNode.gain.value = 1;
+            this.mute.id = "deactivated";
+            this.mute.innerHTML = "Mute";
+        }
+    },
+
+    changeVolume: function(rangeElement) {
+        var volume = element.value;
+        var portion = parseInt(volume) / parseInt(element.max);
+
+        this.gainNode.gain.value = portion * portion;
+    }
 
 
 };
@@ -158,6 +377,23 @@ Flare.Buffer= function (mediaPlayer) {
     
     this.testFrame =  null;
 
+    this.channels = 2 //Stereo for now
+
+    this.frame_count = this.mediaPlayer.audioCtx.sampleRate = 2.0;
+
+    this.audio_buffer = this.mediaPlayer.audioCtx.createBuffer(this.channels, this.frame_count, this.mediaPlayer.audioCtx.sampleRate);
+
+    this.frameBuffer;
+    
+    this.frameCount;
+
+    this.frameRate;
+    
+    this.framesLoaded = 0;
+    this.isLoaded = false;
+    
+    this.audioData = null;
+    
     return this;
     
     
@@ -166,7 +402,61 @@ Flare.Buffer= function (mediaPlayer) {
 };
 
 Flare.Buffer.prototype = {
+	write: function () {
+		for(var channel = 0; channel < channels; channel++){
+			this.current_buffer = this.audio_buffer.getChannelData(channel);
+			for(var i = 0; i < this.frame_count; i++){
+				this.current_buffer[i] = Math.random() * 2 - 1;
+			}
+		}
 
+		var source = this.mediaPlayer.audioSource;
+
+		source.buffer = this.audio_buffer;
+
+		source.connect(this.mediaPlayer.audioCtx.destination);
+	},
+
+	read: function () {
+		this.return_array = this.audio_buffer.slice();	//throw exception if reading from empty buffer
+		return this.return_array;
+	},
+        
+        initFrameBuffer: function(_frameCount, _frameRate){
+            
+            this.frameBuffer = new Array(_frameCount);
+            this.frameCount = _frameCount;
+            this.frameRate = _frameRate
+            
+        },
+        
+        getFrameAt : function(index){
+            
+            return this.frameBuffer[index];
+            
+        },
+        
+        setFrameAt : function (index, frame){
+            
+            this.frameBuffer[index] = frame;
+            this.framesLoaded++;
+            
+            if(this.frameCount == this.framesLoaded){
+                this.isLoaded = true;
+                this.mediaPlayer.videoPlayer.toggleLockingButtons(); // locking all buttons in mediaplayer
+                this.mediaPlayer.videoPlayer.removeLoadingBar();
+                console.log("buffer doneLoading");
+            }
+        },
+        
+        setAudioData : function(data){
+            this.audioData = data;
+            console.log(this.audioData);
+        },
+        
+        getAudioSource : function(){
+            return this.audioData;
+        }
 
 };
 
@@ -218,26 +508,26 @@ Flare.Canvas.prototype = {
 };
 
 Flare.Canvas.prototype.constructor = Flare.Canvas;
-Flare.MediaPlayer = function (userOptions) {
+Flare.MediaPlayer = function(userOptions) {
 
     /**
      * @property {number} id - video player id, for handling multiple MediaPlayer Objects
      * @readonly
      */
     this.id = Flare.PLAYERS.push(this) - 1;
-    
-    
+
+
     this.options = {
-        
-        container : '',
-        videoPath: '',
-        videoSize : Flare.CONSTANTS.VIDEO_SIZE.ORIGINAL,
+        videoID: '',
+        container: '',
+        //videoPath: '',
+        videoSize: Flare.CONSTANTS.VIDEO_SIZE.ORIGINAL,
         videoScale: '',
         width: 960,
         height: 540
-                
+
     }; //Default options
-    
+
     this.parseOptions(userOptions);
 
     this.parent = "parent";
@@ -255,14 +545,17 @@ Flare.MediaPlayer = function (userOptions) {
     this.isBooted = null;
     this.oscillator = null;
     this.videoPlayer = null;
-    
+    this.audioEngine = null;
     this.buffer = null;
-    
+    this.audioCtx = null;
     this.isPlaying = false;
-    
+
     this.testCounter = 0;
-    
-    
+    this.timeStarted = 0;
+    this.totalTimePaused = 0;
+    this.numPressedPlay = 0;
+
+
     /**
      * @property {Flare.Device} Reference to global device object
      */
@@ -277,93 +570,107 @@ Flare.MediaPlayer = function (userOptions) {
 };
 
 Flare.MediaPlayer.prototype = {
-    
-    parseOptions: function(userOptions){
+
+    parseOptions: function(userOptions) {
         //REMEMBER TO SANITIZE USER INPUT
-        if (typeof userOptions.videoPath != 'undefined'){
-            
-            this.options.videoPath = userOptions.videoPath;
-            
-        }else{
+        console.log(userOptions);
+        if (typeof userOptions.videoID != 'undefined') {
+
+            this.options.videoID = userOptions.videoID;
+
+        } else {
             console.log("location is not set");
         }
-        
-    },
-    
-    boot: function () {
 
-        if (this.isBooted)
-        {
+    },
+
+    boot: function() {
+
+        if (this.isBooted) {
             return;
         }
 
         this._forceUpdate = true;
 
+        var AudioContext = window.AudioContext || window.webkitAudioContext;
+        this.audioCtx = new AudioContext();
         //Initialize System
         this.oscillator = new Flare.Oscillator(this);
         this.clock = new Flare.Clock(this);
         this.buffer = new Flare.Buffer(this);
+        this.audioEngine = new Flare.AudioEngine(this);
         this._networkManager = new Flare.NetworkManager(this);
         //this._networkManager.requestVideo(this.options.videoPath);
-        
-        
-        
+
+
+
         this.videoPlayer = new Flare.VideoPlayer(this);
-        
+
         //this.canvas = new Flare.Canvas(this);
         //this.canvas.addToDOM();
 
-
-        //FOR TESTING ONLY
-        this.frames = [152];
-        var fileNum;
-        for(var f = 0 ; f< 152; f++){
-            this.frames[f] = new Image(960,540);
-            if(f  < 10 ) {
-                fileNum = "00" + f;
-            }else if (f < 100){
-                fileNum = "0" + f;
-            }else{
-                fileNum = f;
-            }
-            this.frames[f].src = './testVideo/frame' + fileNum + '.jpg';
-        }
-        //END TESTING
-        
         this.videoPlayer.boot();
+        this.audioEngine.boot();
         //Okay now start the oscillator
         this.clock.boot();
         this.oscillator.run();
-       
-        
-        
+
+
+
 
     },
-    
-    
-    //This should probably go in videoEngine
-    update: function (time) {
-        this.clock.update(time);
-        
-        
-            
-        
 
+
+    //This should probably go in videoEngine
+    update: function(time) {
+        this.clock.update(time);
         //Finished with update, render the frame:
         //TESTING ONLY
-        
-  
+
+        if(this.numPressedPlay === 0){
+            this.setStartTime(Date.now());
+        }
+
         //this.canvas.render(this.frames[this.testCounter%152]);
-        this.videoPlayer.update(this.frames[this.testCounter%152]);
-       
-     
-        
-        
-        this.testCounter++;
+        if (this.isPlaying) {
+            //this.videoPlayer.update(this.frames[this.testCounter] , this.testCounter);
+            this.videoPlayer.updateTimeDisplay(this.clock.totalTimePlayed(this.timeStarted, this.totalTimePaused), "0:33");
+
+            this.videoPlayer.update(this.buffer.getFrameAt(this.testCounter), this.testCounter);
+            this.testCounter = (this.testCounter + 1) % 151;
+
+        }
         //Timing is completely messed up. Need to figure out core video engine code
+    },
+
+    setStartTime: function(time) {
+        this.timeStarted = time;
+    },
+
+    togglePlay: function() {
+
+        if (this.isPlaying) {
+            this.isPlaying = false;
+            this.clock.setPauseTime(Date.now());
+        } else {
+            this.isPlaying = true;
+            this.audioEngine.playSound(0);
+            if(this.numPressedPlay > 0){
+                this.totalTimePaused += Date.now() - this.clock.getPauseTime();
+            }
+            this.numPressedPlay++;
+        }
+    },
+
+    isPlayMode: function() {
+        return this.isPlaying;
+    },
+
+    getNumPressedPlay: function() {
+        return this.numPressedPlay;
     }
-    
-  
+
+
 };
 
 Flare.MediaPlayer.prototype.constructor = Flare.MediaPlayer;
@@ -430,106 +737,378 @@ Flare.VideoEngine.prototype = {
 };
 
 Flare.VideoEngine.prototype.constructor = Flare.VideoEngine;
-
-Flare.VideoPlayer= function (mediaPlayer) {
+Flare.VideoPlayer = function(mediaPlayer) {
 
 
     /**
-    * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
-    */
+     * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
+     */
     this.mediaPlayer = mediaPlayer;
     this.canvas = null;
     this.videoWidth;
     this.videoHeight;
-    this.videoPlayer = null;
-    this.controlBar = null;
-    
-    this.videoPlayerAttributes = {
-      position: 'relative',
-      overflow: 'hidden',
-      width: '960px',
-      height: '540px'
-      
+    this.videoPlayer;
+    this.controlBar;
+    this.progressBarContainer;
+    this.playButton;
+    this.controlBarInner;
+    this.leftControls;
+    this.rightControls;
+    this.settingsButton;
+    this.settingsPath;
+    this.progressBar;
+    this.progressBarDisplayGroup;
+    this.playProgress;
+    this.timeDisplay;
+    this.volumeControl;
+    this.muteButton;
+    this.loadingBar;
+    this.buttonsLocked = false;
+
+    this.muteButtonStyle = {
+        background: 'none',
+        border: 'none',
+        color: 'white'
     };
-    
-    this.controlBarAttributes = {
+
+    this.volumeControlStyle = {
+        display: 'inline-block'
+
+    };
+
+    this.timeDisplayStyle = {
+        display: 'inline-block',
+        padding: '0 5px',
+        'line-height': '30px',
+        color: 'rgba(255,255,255,0.95)',
+        'font-family': 'Verdana, Geneva, sans-serif',
+        'font-size': '12px'
+    };
+
+    this.playProgressStyle = {
+        position: 'absolute',
+        bottom: 0,
+        left: '0px',
+        'background-color': 'rgba(0,0,255,0.7)',
+        height: '100%',
+        width: '100%',
+        'transform-origin': '0 0 '
+
+    };
+
+    this.progressBarDisplayGroupStyle = {
+        height: '100%',
+        //transform: 'scaleY(0.5)',
+        transition: 'transform .1s cubic-bezier(0.4,0.0,1,1)',
+        'background-color': 'rgba(255,255,255,0.6)',
+        'transform-origin': 'bottom'
+
+
+    };
+
+    this.progressBarStyle = {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        'touch-action': 'none'
+
+    };
+
+    this.progressBarAttribtues = {
+        role: 'slider',
+        draggable: 'true',
+        'aria-valuemin': 0,
+        'aria-valuemax': 100,
+        'aria-valuenow': 0,
+        //'tabindex' : 0
+
+    };
+
+    this.rightControlsStyle = {
+        float: 'right',
+        height: '100%'
+    };
+
+
+
+    this.leftControlsStyle = {
+        float: 'left',
+        height: '100%'
+    };
+
+    this.videoPlayerStyle = {
+        position: 'relative',
+        overflow: 'hidden',
+        width: '960px',
+        height: '540px'
+
+    };
+
+    this.controlBarInnerStyle = {
+
+    };
+
+    this.controlBarStyle = {
         height: '30px',
         position: 'absolute',
         bottom: '0',
-        left: 0 ,
-        right: 0 ,
+        left: 0,
+        right: 0,
         'background-color': 'rgba(0,0,0,0.5)'
     };
-    
+
+    this.playButtonStyle = {
+        color: 'white',
+        'font-size': '20px',
+        background: 'transparent',
+        border: 'none',
+        cursor: 'pointer',
+        width: '30px'
+
+    };
+
+    this.progressBarContainerStyle = {
+        width: '100%',
+        position: 'absolute',
+        height: '5px',
+        bottom: '30px',
+        cursor: 'pointer'
+    };
+
+    this.loadingBarStyle = {
+        position: 'absolute',
+        left: '40%',
+        top: '30%',
+        right: '0px',
+        bottom: '0px',
+        width: '100%',
+        height: '100%',
+        'z-index': '99',
+        background: "url('../src/images/page-loader.gif')",
+        'background-repeat': 'no-repeat'
+    };
+
     return this;
-    
-    
-    
+
+
+
 };
 
 Flare.VideoPlayer.prototype = {
-    
-    boot: function(){
-        
+
+    boot: function() {
+
         this.videoPlayer = document.createElement("div");
+        this.loadingBar = document.createElement("div");
+        this.controlBar = document.createElement("div");
+        this.progressBarContainer = document.createElement("div");
+        this.leftControls = document.createElement("div");
+        this.rightControls = document.createElement("div");
+        this.controlBarInner = document.createElement("div");
+        this.playButton = document.createElement("button");
+        this.muteButton = document.createElement("button");
+        this.volumeControl = document.createElement("div");
+        this.progressBar = document.createElement("div");
+        this.progressBarDisplayGroup = document.createElement("div");
+        this.controlBarInner = document.createElement("div");
+        this.playProgress = document.createElement("div");
+        this.timeDisplay = document.createElement("div");
+        this.settingsButton = document.createElement("svg");
+        this.settingsPath = document.createElementNS('http://www.w3.org/2000/svg', "path");
+
+
+        this.settingsPath.setAttributeNS(null, "d", Flare.Icons.settings);
         this.videoPlayer.id = "videoId";
+
+        this.playButton.innerHTML = "&#x025B8;";
+        this.muteButton.innerHTML = "&#9732;";
 
 
         this.canvas = new Flare.Canvas(this);
+
+
+        this.setStyle(this.videoPlayer, this.videoPlayerStyle);
+        this.setStyle(this.controlBar, this.controlBarStyle);
+        this.setStyle(this.playButton, this.playButtonStyle);
+        this.setStyle(this.progressBarContainer, this.progressBarContainerStyle);
+        this.setStyle(this.leftControls, this.leftControlsStyle);
+        this.setStyle(this.rightControls, this.rightControlsStyle);
+        this.setStyle(this.progressBar, this.progressBarStyle);
+        this.setStyle(this.progressBarDisplayGroup, this.progressBarDisplayGroupStyle);
+        this.setStyle(this.playProgress, this.playProgressStyle);
+        this.setStyle(this.timeDisplay, this.timeDisplayStyle);
+        this.setStyle(this.volumeControl, this.volumeControlStyle);
+        this.setStyle(this.muteButton, this.muteButtonStyle);
+        this.setStyle(this.loadingBar, this.loadingBarStyle);
+
+        this.setAttributes(this.progressBar, this.progressBarAttribtues);
+
+        this.settingsButton.appendChild(this.settingsPath);
         this.videoPlayer.appendChild(this.canvas.getCanvas());
-        
-        this.controlBar = document.createElement("div");
+        this.controlBarInner.appendChild(this.leftControls);
+        this.controlBarInner.appendChild(this.rightControls);
+        this.volumeControl.appendChild(this.muteButton);
+        this.leftControls.appendChild(this.playButton);
+        this.leftControls.appendChild(this.volumeControl);
+        this.leftControls.appendChild(this.timeDisplay);
+        this.rightControls.appendChild(this.settingsButton);
+        this.progressBarContainer.appendChild(this.progressBar);
+        this.progressBar.appendChild(this.progressBarDisplayGroup);
+        this.progressBarDisplayGroup.appendChild(this.playProgress);
+        this.controlBar.appendChild(this.progressBarContainer);
+        this.controlBar.appendChild(this.controlBarInner);
+
+        //BIND HANDLERS
+        this.progressBar.onmousedown = this.handleMouseDown.bind(this);
+        this.progressBar.ondragstart = this.handleDragStart.bind(this);
+        this.progressBar.ondrag = this.handleDrag.bind(this);
+        this.progressBar.ondragend = this.handleDragEnd.bind(this);
+        this.playButton.onclick = this.handlePlayButtonPress.bind(this);
 
 
-        this.setAttributes(this.videoPlayer, this.videoPlayerAttributes);
-        this.setAttributes(this.controlBar, this.controlBarAttributes);
         this.videoPlayer.appendChild(this.controlBar);
-        
-        
-        var target;
-        var parent = null;//this.mediaPlayer.parent;
+        this.videoPlayer.appendChild(this.loadingBar);
+        if (!this.mediaPlayer.buffer.isLoaded) {
+            this.toggleLockingButtons();
+        }
 
-        
-        if (parent)
-        {
-            if (typeof parent === 'string')
-            {
+
+        this.updatePlayProgress(0.4);
+
+
+
+        var target;
+        var parent = null; //this.mediaPlayer.parent;
+
+
+        if (parent) {
+            if (typeof parent === 'string') {
                 target = document.getElementById(parent);
-            } else if (typeof parent === 'object' && parent.nodeType === 1)
-            {
+            } else if (typeof parent === 'object' && parent.nodeType === 1) {
                 target = parent;
             }
         }
-        
+
         // Fallback, covers an invalid ID and a non HTMLelement object
-        if (!target){
-            
+        if (!target) {
+
             target = document.body;
         }
-        
-        
+
         target.appendChild(this.videoPlayer);
     },
-    
 
-    
-    update: function(frame){
-    
+
+
+    update: function(frame, frameNumber) {
+
         this.canvas.render(frame);
-        
+        this.updatePlayProgress((frameNumber) / 150);
+        //this.updateTimeDisplay();
+
     },
-    
-    setAttributes : function(element, attributes){
-        
-        for (var attribute in attributes){
+
+    setStyle: function(element, attributes) {
+
+        for (var attribute in attributes) {
             element.style.setProperty(attribute, attributes[attribute]);
         }
-        
 
+
+    },
+
+    setAttributes: function(element, attributes) {
+
+        for (var attribute in attributes) {
+            element.setAttribute(attribute, attributes[attribute]);
+        }
+    },
+
+
+
+    updatePlayProgress: function(progress) {
+        this.playProgress.style.setProperty("transform", "scaleX(" + progress + ")");
+        this.progressBar.setAttribute("aria-valuenow", parseInt(progress * 100));
+    },
+
+    handleMouseDown: function(e) {
+        console.log(e);
+        var currentProgress = parseInt(this.progressBar.getAttribute('aria-valuenow'));
+        this.mediaPlayer.isPlaying = false;
+
+        return false;
+    },
+
+    handleDragStart: function(e) {
+
+        console.log(e);
+
+    },
+
+    handleDrag: function(e) {
+
+        //Make new indicator to show the drag location
+
+        //First get position of cursor depending on location
+
+        //Calculate percentage
+
+        //Now set the valuenow to the % progress
+        console.log(e);
+
+    },
+
+    handleDragEnd: function(e) {
+
+        //if in play mode, continue playing from new location
+        //buffer if neccessary
+
+    },
+
+    handlePlayButtonPress: function(e) {
+        console.log("play clicked");
+        this.mediaPlayer.togglePlay();
+
+        if (this.mediaPlayer.isPlayMode()) {
+            this.playButton.innerHTML = "||";
+        } else {
+            this.playButton.innerHTML = "&#x025B8;";
+        }
+
+    },
+
+    updateTimeDisplay: function(elapsed, duration) {
+        this.timeDisplay.innerHTML = elapsed + " / " + duration;    
+    },
+
+    removeLoadingBar: function(){
+        this.videoPlayer.removeChild(this.loadingBar);
+    },
+
+    toggleLockingButtons: function() {
+        if (this.buttonsLocked) {
+            this.playButton.removeAttribute("disabled");
+            this.muteButton.removeAttribute("disabled");
+            this.volumeControl.removeAttribute("disabled");
+            this.progressBar.removeAttribute("disabled");
+            this.settingsButton.removeAttribute("disabled");
+
+            this.buttonsLocked = false;
+        } else { // lock buttons
+            this.playButton.setAttribute("disabled", "disabled");
+            this.muteButton.setAttribute("disabled", "disabled");
+            this.volumeControl.setAttribute("disabled", "disabled");
+            this.progressBar.setAttribute("disabled", "disabled");
+            this.settingsButton.setAttribute("disabled", "disabled");
+            this.buttonsLocked = true;
+        }
     }
-    
-    
-    
+
+
+
+
 
 };
 
@@ -644,7 +1223,9 @@ Flare.OpenVideoMessage.prototype.toBinary = function () {
 Flare.OpCode = {
     //Put Constant values here
 
-    OPEN_VIDEO : 0
+    OPEN_VIDEO : 0,
+    FRAME : 1,
+    AUDIO : 2
 
 
 
@@ -652,6 +1233,17 @@ Flare.OpCode = {
 
 Flare.TaskTable = {};
 Flare.TaskTable[Flare.OpCode.OPEN_VIDEO] = Flare.InitializeVideoTask;
+Flare.TaskTable[Flare.OpCode.FRAME] = Flare.ProcessFrameTask;
+Flare.TaskTable[Flare.OpCode.AUDIO] = Flare.ProcessAudioTask;
+
+Flare.Icons = {
+  settings : 
+      "M863.24,382.771l-88.759-14.807c-6.451-26.374-15.857-51.585-28.107-75.099l56.821-70.452   c12.085-14.889,11.536-36.312-1.205-50.682l-35.301-39.729c-12.796-14.355-34.016-17.391-50.202-7.165l-75.906,47.716   c-33.386-23.326-71.204-40.551-112-50.546l-14.85-89.235c-3.116-18.895-19.467-32.759-38.661-32.759h-53.198   c-19.155,0-35.561,13.864-38.608,32.759l-14.931,89.263c-33.729,8.258-65.353,21.588-94.213,39.144l-72.188-51.518   c-15.558-11.115-36.927-9.377-50.504,4.171l-37.583,37.61c-13.548,13.577-15.286,34.946-4.142,50.504l51.638,72.326   c-17.391,28.642-30.584,60.086-38.841,93.515l-89.743,14.985C13.891,385.888,0,402.24,0,421.435v53.156   c0,19.193,13.891,35.547,32.757,38.663l89.743,14.985c6.781,27.508,16.625,53.784,29.709,78.147L95.647,676.44   c-12.044,14.875-11.538,36.312,1.203,50.669l35.274,39.73c12.797,14.382,34.028,17.363,50.216,7.163l77-48.37   c32.581,22.285,69.44,38.664,108.993,48.37l14.931,89.25c3.048,18.896,19.453,32.76,38.608,32.76h53.198   c19.194,0,35.545-13.863,38.661-32.759l14.875-89.25c33.308-8.147,64.531-21.245,93.134-38.5l75.196,53.705   c15.53,11.155,36.915,9.405,50.478-4.186l37.598-37.597c13.532-13.536,15.365-34.893,4.127-50.479l-53.536-75.059   c17.441-28.738,30.704-60.238,38.909-93.816l88.758-14.82c18.921-3.116,32.756-19.469,32.756-38.663v-53.156   C895.998,402.24,882.163,385.888,863.24,382.771z M449.42,616.013c-92.764,0-168-75.25-168-168c0-92.764,75.236-168,168-168   c92.748,0,167.998,75.236,167.998,168C617.418,540.763,542.168,616.013,449.42,616.013z"
+
+   
+    
+};
+
 
 Flare.NetworkManager = function (mediaPlayer) {
 
@@ -719,15 +1311,21 @@ Flare.NetworkManager.prototype = {
         
         if (message.data instanceof ArrayBuffer ){
             
+            
             //All incoming binary should be images
             //console.log(message);
             var dataView = new DataView(message.data);
-            var opCode = dataView.getInt8(0);
+            var opCode = dataView.getInt8(4);
+            var dataLength = dataView.getUint32(0);
+            //console.log("lenth " + dataLength);
+            console.log("opCode " + opCode);
+            
             
             var task = new Flare.TaskTable[opCode];
             task.setData(message.data);
             task.setMediaPlayer(this.mediaPlayer);
             task.process();
+            
             
             
             /*
@@ -795,21 +1393,12 @@ Flare.NetworkManager.prototype = {
     requestVideo: function(){
         
         var videoRequest = new Flare.OpenVideoMessage();
-        videoRequest.setRequestFile(this.mediaPlayer.options.videoPath);
-        //console.log(videoRequest);
+        videoRequest.setRequestFile(this.mediaPlayer.options.videoID);
+        
         
         //console.log(videoRequest.toBinary());
         this.socket.send(videoRequest.toBinary());
         
-        /*
-        var request = {
-            opCode: Flare.CONSTANTS.NETWORK.REQUEST_VIDEO,
-            path : videoPath
-        };
-        
-        //console.log(JSON.stringify(request));
-        */
-        this.socket.send("hello");
         
         
     }
@@ -862,6 +1451,13 @@ Flare.Clock = function (mediaPlayer) {
     
     this.lastTimeUpdated = 0;
 
+    this.timeStarted = 0;
+
+    this.timePaused = 0;
+
+    this.time = 0;
+
+    this.minutes = 0;
     
     return this;
 
@@ -888,7 +1484,7 @@ Flare.Clock.prototype = {
 
     },
     
-    update: function(time){
+    update: function(time) {
        
        
         this.lastTimeUpdated = this.timeUpdated;
@@ -904,6 +1500,35 @@ Flare.Clock.prototype = {
 
         this.elapsed = this.currentTime - this.previousTime;
         
+    },
+
+    totalTimePlayed: function(startTime, pauseTime) {
+        if(startTime === 0){    //video has not started playing yet
+            return 0;
+        }
+        this.time = ((Date.now() - startTime) - pauseTime) / 1000;
+        var seconds = Math.floor(this.time * 1) / 1;
+        if(seconds > 59){
+            console.log(seconds); 
+            this.minutes++;
+            this.time = 0;
+            seconds = 0;
+            this.mediaPlayer.setStartTime(Date.now()); 
+        } else {
+
+        }
+        if(seconds < 10){
+            return this.minutes + ":0" + seconds;
+        }
+        return this.minutes + ":" + seconds;
+    },
+
+    getPauseTime: function() {
+        return this.timePaused;
+    },
+
+    setPauseTime: function(time) {
+        this.timePaused = time;
     }
   
 };
@@ -1024,39 +1649,23 @@ Flare.Device = function() {
      * @protected
      */
     this.initialized = false;
-    /* Device need to check if the browser can do websocket
-     - Is it touch ?
-     - Make a handler to get DOM info so we can tell if the video is in the view port and stuff like that
-    */
-
+    /* Make a handler to get DOM info so we can tell if the video is in the view port and stuff like that */
+    this.isCompatible = false;
     //  Features
+    this.hasGeneralInputTypes = false;
     this.hasCanvas = false;
     this.hasWebGL = false;
     this.hasFile = false;
-    //this.hasFileSystem = false;
     this.hasLocalStorage = false;
-    this.hasCss3D = false;
-    //this.hasPointerLock = false;
+    //this.hasCss3D = false;
     this.hasTypedArray = false;
-    //this.hasVibration = false;
-
     //  Input
     this.hasTouch = false;
-    //this.hasMousePointer = false;
-    //this.hasWheelEvent = null;
-
     //  Audio
-    //this.hasAudioData = false;
     this.hasWebAudio = false;
-
     // Device features
-    this.littleEndian = false;
-    this.bigEndian = false;
     this.fullscreen = false;
     this.webSocket = false;
-
-
-
 };
 
 
@@ -1127,14 +1736,14 @@ Flare.Device._initialize = function() {
         return ('ontouchstart' in window) && (window.navigator.MaxTouchPoints > 0);
     }
 
-    function supportsInputFile() {
+    function supportsInput(type) {
         try {
-            var inputElement = document.createElement("input");
-            inputElement.setAttribute("type", "file");
+            var input = document.createElement('input');
+            input.setAttribute("type", type);
         } catch (e) {
             return false;
         }
-        return inputElement.type !== "text"; // If type = text, the web browser didn't make  <input>
+        return input.type !== "text";
     }
 
     function supportsFullscreen() {
@@ -1151,31 +1760,24 @@ Flare.Device._initialize = function() {
     }
 
     /** Variable initialization     */
-    
+
     this.hasCanvas = supportsCanvas();
     this.hasWebGL = supportsWebGL();
-    this.hasFile = supportsInputFile();
-    //this.hasFileSystem = false; // ??
+    this.hasFile = supportsInput("file");
     this.hasLocalStorage = supportsHTML5Storage();
     //this.hasCss3D = supportsCss3D();
-    //this.hasPointerLock = false;
     this.hasTypedArray = 'ArrayBuffer' in window;
-    //this.hasVibration = false;
-
     //  Input
     this.hasTouch = isTouch();
-    // this.hasMousePointer = false; Why do we need this? 
-    //this.hasWheelEvent = null;
-
     //  Audio
-    //this.hasAudioData = false;
     this.hasWebAudio = supportsWebAudio();
-
     // Device features
-    this.littleEndian = false;
-    this.bigEndian = false;
     this.webSocket = supportsWebSocket();
     this.fullscreen = supportsFullscreen();
+    var range = supportsInput("range");
+    this.hasGeneralInputTypes = range; // Can do hasFile too
+    this.isCompatible = this.hasCanvas && this.hasGeneralInputTypes
+        && this.webSocket && this.hasWebAudio;
 };
 
 Flare.Device.whenReady = function(callback, context) {
@@ -1209,7 +1811,6 @@ Flare.Device.whenReady = function(callback, context) {
         }
     }
 };
-
 
 Flare.Device._readyCheck = function() {
 

@@ -26,6 +26,13 @@ Flare.Clock = function (mediaPlayer) {
     
     this.lastTimeUpdated = 0;
 
+    this.timeStarted = 0;
+
+    this.timePaused = 0;
+
+    this.time = 0;
+
+    this.minutes = 0;
     
     return this;
 
@@ -52,7 +59,7 @@ Flare.Clock.prototype = {
 
     },
     
-    update: function(time){
+    update: function(time) {
        
        
         this.lastTimeUpdated = this.timeUpdated;
@@ -68,6 +75,35 @@ Flare.Clock.prototype = {
 
         this.elapsed = this.currentTime - this.previousTime;
         
+    },
+
+    totalTimePlayed: function(startTime, pauseTime) {
+        if(startTime === 0){    //video has not started playing yet
+            return 0;
+        }
+        this.time = ((Date.now() - startTime) - pauseTime) / 1000;
+        var seconds = Math.floor(this.time * 1) / 1;
+        if(seconds > 59){
+            console.log(seconds); 
+            this.minutes++;
+            this.time = 0;
+            seconds = 0;
+            this.mediaPlayer.setStartTime(Date.now()); 
+        } else {
+
+        }
+        if(seconds < 10){
+            return this.minutes + ":0" + seconds;
+        }
+        return this.minutes + ":" + seconds;
+    },
+
+    getPauseTime: function() {
+        return this.timePaused;
+    },
+
+    setPauseTime: function(time) {
+        this.timePaused = time;
     }
   
 };

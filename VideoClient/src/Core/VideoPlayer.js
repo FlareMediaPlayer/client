@@ -267,7 +267,7 @@ Flare.VideoPlayer.prototype = {
 
         this.canvas.render(frame);
         this.updatePlayProgress((frameNumber) / 150);
-        this.updateTimeDisplay();
+        //this.updateTimeDisplay();
 
     },
 
@@ -340,8 +340,8 @@ Flare.VideoPlayer.prototype = {
 
     },
 
-    updateTimeDisplay: function() {
-        this.timeDisplay.innerHTML = "0.24 / 0.33"
+    updateTimeDisplay: function(elapsed, duration) {
+        this.timeDisplay.innerHTML = elapsed + " / " + duration;    
     },
 
     removeLoadingBar: function(){
