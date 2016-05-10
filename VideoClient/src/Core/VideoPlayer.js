@@ -28,6 +28,7 @@ Flare.VideoPlayer = function(mediaPlayer) {
     this.loadingBar;
     this.buttonsLocked = false;
     this.durationInMin = 0;
+    this.fps;
 
     this.muteButtonStyle = {
         background: 'none',
@@ -292,9 +293,9 @@ Flare.VideoPlayer.prototype = {
             return;
         }
         
-        var frameNumber = Math.floor(progress * this.mediaPlayer.buffer.getFrameCount());
-        console.log(progress + "progress");
-        console.log (frameNumber + "frame num");
+        var frameNumber = Math.floor((videoTime/1000) * this.fps);
+        //console.log(progress + "progress");
+        //console.log (frameNumber + "frame num");
         this.canvas.render(this.mediaPlayer.buffer.getFrameAt(frameNumber));
         
         this.updatePlayProgress(progress);
@@ -427,6 +428,10 @@ Flare.VideoPlayer.prototype = {
         this.durationInMin = this.formatTimeFromSeconds(duration);
         this.updateTimeDisplay(0);
         
+    },
+    
+    setFps: function(fps){
+        this.fps = fps;
     }
 
     

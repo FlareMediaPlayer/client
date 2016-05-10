@@ -72,7 +72,7 @@ Flare.NetworkManager.prototype = {
             var opCode = dataView.getInt8(4);
             var dataLength = dataView.getUint32(0);
             //console.log("lenth " + dataLength);
-            console.log("opCode " + opCode);
+            //console.log("opCode " + opCode);
             
             
             var task = new Flare.TaskTable[opCode];

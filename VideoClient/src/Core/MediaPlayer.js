@@ -129,8 +129,9 @@ Flare.MediaPlayer.prototype = {
         //this.canvas.render(this.frames[this.testCounter%152]);
         if (this.isPlaying) {
             
+            
             this.deltaTime = Date.now() - this.timeStarted;
-
+            this.audioEngine.playSound(this.deltaTime);  
             //this.videoPlayer.updateTimeDisplay(this.clock.totalTimePlayed(this.timeStarted, this.totalTimePaused), "0:33");
             
             //this.videoPlayer.update(this.buffer.getFrameAt(this.testCounter), this.testCounter);
@@ -165,7 +166,7 @@ Flare.MediaPlayer.prototype = {
             }else{
                 this.setStartTime(Date.now()-this.deltaTime);
             }
-            this.audioEngine.playSound(Math.floor(Date.now() - this.timeStarted));
+            //this.audioEngine.playSound(Date.now() - this.timeStarted);
             /*
             if(this.numPressedPlay > 0){
                 this.totalTimePaused += Date.now() - this.clock.getPauseTime();
@@ -192,8 +193,9 @@ Flare.MediaPlayer.prototype = {
     
     finishPlayback: function(){
         this.isPlaying = false;
+        this.audioEngine.stopSound();
         this.reset();
-        this
+        
     }
 
 

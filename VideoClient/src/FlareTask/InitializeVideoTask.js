@@ -63,6 +63,7 @@ Flare.InitializeVideoTask.prototype.process = function() {
    
        this.mediaPlayer.buffer.initFrameBuffer(this.frameCount, this.fps , this.duration); //Swap out for dynamic buffer and frame rate later
        this.mediaPlayer.videoPlayer.setDuration(this.duration);
+       this.mediaPlayer.videoPlayer.setFps(this.fps);
        
        console.log("video is available!");
     }else{

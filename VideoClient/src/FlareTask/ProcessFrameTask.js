@@ -47,7 +47,7 @@ Flare.ProcessFrameTask.prototype.process = function() {
     var urlCreator = window.URL || window.webkitURL;
     var imageUrl = urlCreator.createObjectURL( blob );
     img.src = imageUrl;
-    console.log("frame " +index + "loaded");
+    //console.log("frame " +index + "loaded");
   
  
 

@@ -26,6 +26,8 @@ Flare.Buffer= function (mediaPlayer) {
     
     this.duration;
     
+    this.fps;
+    
     this.framesLoaded = 0;
     this.isLoaded = false;
     
@@ -96,7 +98,7 @@ Flare.Buffer.prototype = {
         setAudioData : function(data){
             this.audioData = data;
             //this.mediaPlayer.audioEngine.createNewBufferSource();
-            console.log(this.audioData);
+            //console.log(this.audioData);
         },
         
         getAudioSource : function(){
@@ -109,6 +111,14 @@ Flare.Buffer.prototype = {
         
         getDuration: function(){
             return this.duration;
+        },
+        
+        getFps : function(){
+            return this.fps();
+        },
+        
+        setFps : function(fps){
+            this.fps = fps;
         }
 
 };

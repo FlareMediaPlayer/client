@@ -8,7 +8,7 @@ Flare.AudioEngine = function(mediaPlayer) {
     //Remember to check device.isCompatible
     this.mute;
     this.source = null;
-
+    this.offset;
     this.analyser;
     this.distortion;
     this.gainNode;
@@ -31,11 +31,13 @@ Flare.AudioEngine.prototype = {
         //this.source.buffer = this.mediaPlayer.buffer.getAudioSource();//Buffer.read Waiting for Jens to finish is buffering
 
         this.source = this.mediaPlayer.audioCtx.createBufferSource();
-        this.mediaPlayer.audioCtx.decodeAudioData(this.mediaPlayer.buffer.getAudioSource(), function(decodedBuffer) {
+        this.mediaPlayer.audioCtx.decodeAudioData(this.mediaPlayer.buffer.getAudioSource(),  function(decodedBuffer) {
             this.source.buffer = decodedBuffer;
             console.log("done loading buffer");
             this.source.connect(this.gainNode);
             this.gainNode.connect(this.mediaPlayer.audioCtx.destination);
+            console.log(this.offset);
+            this.source.start(0, this.offset );
         }.bind(this));
 
 
@@ -50,13 +52,20 @@ Flare.AudioEngine.prototype = {
     },
 
     playSound: function(time) {
-
+        
+        if (this.playing)
+            return;
+        
+        this.offset = time/1000;
         this.createNewBufferSource();
 
         //if (!this.source.start) //If the browser does not support web audio
           //  this.source.start = source.noteOn;
-        console.log(time + "playing at");
-        this.source.start(0,time*1000);
+        
+       //console.log(timeOffset + "playing at");
+       // console.log("duration" + this.source.duration)
+        //this.source.start(0,time/1000);
+        //this.source.start(0, 7 );
         this.playing = true;
     },
 
