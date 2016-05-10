@@ -53,19 +53,19 @@ Flare.AudioEngine.prototype = {
 
         this.createNewBufferSource();
 
-        if (!this.source.start) //If the browser does not support web audio
-            this.source.start = source.noteOn;
-
-        this.source.start(time);
+        //if (!this.source.start) //If the browser does not support web audio
+          //  this.source.start = source.noteOn;
+        console.log(time + "playing at");
+        this.source.start(0,time*1000);
         this.playing = true;
     },
 
-    stopSound: function(time) {
+    stopSound: function() {
 
-        if (!this.source.stop)
-            this.source.stop = this.source.noteOff;
+        //if (!this.source.stop)
+          //  this.source.stop = this.source.noteOff;
 
-        this.source.stop(time)
+        this.source.stop();
         this.playing = false;
     },
 
@@ -91,7 +91,13 @@ Flare.AudioEngine.prototype = {
         var portion = parseInt(volume) / parseInt(element.max);
 
         this.gainNode.gain.value = portion * portion;
+    },
+    
+    finishPlayback: function(){
+        
     }
+    
+    
 
 
 };

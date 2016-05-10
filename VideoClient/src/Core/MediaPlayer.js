@@ -44,6 +44,9 @@ Flare.MediaPlayer = function(userOptions) {
     this.timeStarted = 0;
     this.totalTimePaused = 0;
     this.numPressedPlay = 0;
+    this.deltaTime;
+    this.timePaused = 0;
+    this.donePlaying = false;
 
 
     /**
@@ -117,39 +120,66 @@ Flare.MediaPlayer.prototype = {
         //Finished with update, render the frame:
         //TESTING ONLY
 
+        /*
         if(this.numPressedPlay === 0){
             this.setStartTime(Date.now());
         }
+        */
 
         //this.canvas.render(this.frames[this.testCounter%152]);
         if (this.isPlaying) {
-            //this.videoPlayer.update(this.frames[this.testCounter] , this.testCounter);
-            this.videoPlayer.updateTimeDisplay(this.clock.totalTimePlayed(this.timeStarted, this.totalTimePaused), "0:33");
+            
+            this.deltaTime = Date.now() - this.timeStarted;
 
-            this.videoPlayer.update(this.buffer.getFrameAt(this.testCounter), this.testCounter);
-            this.testCounter = (this.testCounter + 1) % 151;
+            //this.videoPlayer.updateTimeDisplay(this.clock.totalTimePlayed(this.timeStarted, this.totalTimePaused), "0:33");
+            
+            //this.videoPlayer.update(this.buffer.getFrameAt(this.testCounter), this.testCounter);
+            this.videoPlayer.update(this.deltaTime);
+            //this.testCounter = (this.testCounter + 1) % 151;
 
         }
-        //Timing is completely messed up. Need to figure out core video engine code
+        
     },
 
     setStartTime: function(time) {
         this.timeStarted = time;
     },
 
+    setPauseTime: function(time) {
+        this.timePaused = time;
+    },
+    
     togglePlay: function() {
 
         if (this.isPlaying) {
             this.isPlaying = false;
             this.clock.setPauseTime(Date.now());
+            this.timePaused = Date.now();
+            this.audioEngine.stopSound();
         } else {
             this.isPlaying = true;
-            this.audioEngine.playSound(0);
+            
+            
+            if(this.timePaused === 0){
+                this.setStartTime(Date.now());
+            }else{
+                this.setStartTime(Date.now()-this.deltaTime);
+            }
+            this.audioEngine.playSound(Math.floor(Date.now() - this.timeStarted));
+            /*
             if(this.numPressedPlay > 0){
                 this.totalTimePaused += Date.now() - this.clock.getPauseTime();
             }
             this.numPressedPlay++;
+            */
         }
+    },
+    
+    reset: function(){
+        //reset all counters
+        this.timePaused = 0;
+        this.timeStarted = 0;
+        this.deltaTime = 0;
     },
 
     isPlayMode: function() {
@@ -158,6 +188,12 @@ Flare.MediaPlayer.prototype = {
 
     getNumPressedPlay: function() {
         return this.numPressedPlay;
+    },
+    
+    finishPlayback: function(){
+        this.isPlaying = false;
+        this.reset();
+        this
     }
 
 

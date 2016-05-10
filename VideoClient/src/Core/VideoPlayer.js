@@ -11,6 +11,7 @@ Flare.VideoPlayer = function(mediaPlayer) {
     this.videoPlayer;
     this.controlBar;
     this.progressBarContainer;
+    
     this.playButton;
     this.controlBarInner;
     this.leftControls;
@@ -19,12 +20,14 @@ Flare.VideoPlayer = function(mediaPlayer) {
     this.settingsPath;
     this.progressBar;
     this.progressBarDisplayGroup;
+    this.loadProgressBar;
     this.playProgress;
     this.timeDisplay;
     this.volumeControl;
     this.muteButton;
     this.loadingBar;
     this.buttonsLocked = false;
+    this.durationInMin = 0;
 
     this.muteButtonStyle = {
         background: 'none',
@@ -35,6 +38,16 @@ Flare.VideoPlayer = function(mediaPlayer) {
     this.volumeControlStyle = {
         display: 'inline-block'
 
+    };
+    
+    this.loadProgressBarStyle = {
+        position: 'absolute',
+        bottom: 0,
+        left: '0px',
+        'background-color': 'rgba(255,255,255,0.4)',
+        height: '100%',
+        width: '100%',
+        'transform-origin': '0 0 '
     };
 
     this.timeDisplayStyle = {
@@ -47,21 +60,21 @@ Flare.VideoPlayer = function(mediaPlayer) {
     };
 
     this.playProgressStyle = {
+        'z-index' : 2,
         position: 'absolute',
         bottom: 0,
         left: '0px',
-        'background-color': 'rgba(0,0,255,0.7)',
+        'background-color': 'rgba(0,0,255,0.4)',
         height: '100%',
         width: '100%',
         'transform-origin': '0 0 '
-
     };
 
     this.progressBarDisplayGroupStyle = {
         height: '100%',
         //transform: 'scaleY(0.5)',
         transition: 'transform .1s cubic-bezier(0.4,0.0,1,1)',
-        'background-color': 'rgba(255,255,255,0.6)',
+        'background-color': 'rgba(255,255,255,0.3)',
         'transform-origin': 'bottom'
 
 
@@ -172,12 +185,14 @@ Flare.VideoPlayer.prototype = {
         this.muteButton = document.createElement("button");
         this.volumeControl = document.createElement("div");
         this.progressBar = document.createElement("div");
+        this.loadProgressBar = document.createElement("div");
         this.progressBarDisplayGroup = document.createElement("div");
         this.controlBarInner = document.createElement("div");
         this.playProgress = document.createElement("div");
         this.timeDisplay = document.createElement("div");
         this.settingsButton = document.createElement("svg");
         this.settingsPath = document.createElementNS('http://www.w3.org/2000/svg', "path");
+        
 
 
         this.settingsPath.setAttributeNS(null, "d", Flare.Icons.settings);
@@ -203,6 +218,8 @@ Flare.VideoPlayer.prototype = {
         this.setStyle(this.volumeControl, this.volumeControlStyle);
         this.setStyle(this.muteButton, this.muteButtonStyle);
         this.setStyle(this.loadingBar, this.loadingBarStyle);
+        this.setStyle(this.loadProgressBar, this.loadProgressBarStyle);
+        
 
         this.setAttributes(this.progressBar, this.progressBarAttribtues);
 
@@ -210,7 +227,7 @@ Flare.VideoPlayer.prototype = {
         this.videoPlayer.appendChild(this.canvas.getCanvas());
         this.controlBarInner.appendChild(this.leftControls);
         this.controlBarInner.appendChild(this.rightControls);
-        this.volumeControl.appendChild(this.muteButton);
+        //this.volumeControl.appendChild(this.muteButton);
         this.leftControls.appendChild(this.playButton);
         this.leftControls.appendChild(this.volumeControl);
         this.leftControls.appendChild(this.timeDisplay);
@@ -218,6 +235,7 @@ Flare.VideoPlayer.prototype = {
         this.progressBarContainer.appendChild(this.progressBar);
         this.progressBar.appendChild(this.progressBarDisplayGroup);
         this.progressBarDisplayGroup.appendChild(this.playProgress);
+        this.progressBarDisplayGroup.appendChild(this.loadProgressBar);
         this.controlBar.appendChild(this.progressBarContainer);
         this.controlBar.appendChild(this.controlBarInner);
 
@@ -236,7 +254,8 @@ Flare.VideoPlayer.prototype = {
         }
 
 
-        this.updatePlayProgress(0.4);
+        this.updatePlayProgress(0.0);
+        this.updateLoadProgress(0.0);
 
 
 
@@ -263,11 +282,23 @@ Flare.VideoPlayer.prototype = {
 
 
 
-    update: function(frame, frameNumber) {
-
-        this.canvas.render(frame);
-        this.updatePlayProgress((frameNumber) / 150);
-        //this.updateTimeDisplay();
+    update: function(videoTime) {
+        //calculate which frame number, get that frame from buffer
+        //video time is in ms
+        var progress = (videoTime/1000) / this.mediaPlayer.buffer.getDuration();
+        
+        if(progress >= 1.0){
+            this.mediaPlayer.finishPlayback();
+            return;
+        }
+        
+        var frameNumber = Math.floor(progress * this.mediaPlayer.buffer.getFrameCount());
+        console.log(progress + "progress");
+        console.log (frameNumber + "frame num");
+        this.canvas.render(this.mediaPlayer.buffer.getFrameAt(frameNumber));
+        
+        this.updatePlayProgress(progress);
+        this.updateTimeDisplay(videoTime);
 
     },
 
@@ -292,6 +323,11 @@ Flare.VideoPlayer.prototype = {
     updatePlayProgress: function(progress) {
         this.playProgress.style.setProperty("transform", "scaleX(" + progress + ")");
         this.progressBar.setAttribute("aria-valuenow", parseInt(progress * 100));
+    },
+    
+    updateLoadProgress: function(progress) {
+        this.loadProgressBar.style.setProperty("transform", "scaleX(" + progress + ")");
+        //this.progressBar.setAttribute("aria-valuenow", parseInt(progress * 100));
     },
 
     handleMouseDown: function(e) {
@@ -340,8 +376,27 @@ Flare.VideoPlayer.prototype = {
 
     },
 
-    updateTimeDisplay: function(elapsed, duration) {
-        this.timeDisplay.innerHTML = elapsed + " / " + duration;    
+    updateTimeDisplay: function(videoTime) {
+        this.timeDisplay.innerHTML = this.formatTimeFromMiliSeconds(videoTime)+ " / " + this.durationInMin;    
+    },
+    
+    formatTimeFromSeconds:function (timeInSeconds){
+        var totalSeconds = Math.floor(timeInSeconds);
+        var min =  Math.floor(totalSeconds/60);
+        var seconds = totalSeconds%60;
+        var formattedTime = this.formatDigits(min) + ":" + this.formatDigits(seconds);
+        
+        return formattedTime;
+    },
+    
+    formatTimeFromMiliSeconds:function (timeInMs){
+        return this.formatTimeFromSeconds(timeInMs/1000);
+    },
+    
+    formatDigits: function(time){
+        if (time > 9)
+            return time
+        else return "0" + time;
     },
 
     removeLoadingBar: function(){
@@ -365,8 +420,16 @@ Flare.VideoPlayer.prototype = {
             this.settingsButton.setAttribute("disabled", "disabled");
             this.buttonsLocked = true;
         }
+    },
+    
+    setDuration: function(duration){
+        console.log(this.formatTimeFromSeconds(duration) + "loading");
+        this.durationInMin = this.formatTimeFromSeconds(duration);
+        this.updateTimeDisplay(0);
+        
     }
 
+    
 
 
 

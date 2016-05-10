@@ -53,12 +53,17 @@ Flare.InitializeVideoTask.prototype.process = function() {
        this.height = this.dataView.getInt32(10);
        this.fps = this.dataView.getFloat64(14);
        this.duration = this.dataView.getFloat64(22);
+       this.frameCount = this.dataView.getInt32(30);
        console.log(this.width + " width" );
        console.log(this.height + " height " );
        console.log(this.fps + " fps " );
        console.log(this.duration + " duration " );
+       console.log(this.frameCount + "frame Count");
        
-       this.mediaPlayer.buffer.initFrameBuffer(337, this.fps); //Swap out for dynamic buffer and frame rate later
+   
+       this.mediaPlayer.buffer.initFrameBuffer(this.frameCount, this.fps , this.duration); //Swap out for dynamic buffer and frame rate later
+       this.mediaPlayer.videoPlayer.setDuration(this.duration);
+       
        console.log("video is available!");
     }else{
         console.log("video is not available!");

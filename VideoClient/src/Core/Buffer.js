@@ -24,6 +24,8 @@ Flare.Buffer= function (mediaPlayer) {
 
     this.frameRate;
     
+    this.duration;
+    
     this.framesLoaded = 0;
     this.isLoaded = false;
     
@@ -57,11 +59,12 @@ Flare.Buffer.prototype = {
 		return this.return_array;
 	},
         
-        initFrameBuffer: function(_frameCount, _frameRate){
+        initFrameBuffer: function(_frameCount, _frameRate, _duration){
             
             this.frameBuffer = new Array(_frameCount);
             this.frameCount = _frameCount;
-            this.frameRate = _frameRate
+            this.frameRate = _frameRate;
+            this.duration = _duration;
             
         },
         
@@ -76,7 +79,9 @@ Flare.Buffer.prototype = {
             this.frameBuffer[index] = frame;
             this.framesLoaded++;
             
-            if(this.frameCount == this.framesLoaded){
+            this.mediaPlayer.videoPlayer.updateLoadProgress(this.framesLoaded / this.frameCount);
+            
+            if(this.frameCount === this.framesLoaded){
                 this.isLoaded = true;
                 this.mediaPlayer.videoPlayer.toggleLockingButtons(); // locking all buttons in mediaplayer
                 this.mediaPlayer.videoPlayer.removeLoadingBar();
@@ -84,13 +89,26 @@ Flare.Buffer.prototype = {
             }
         },
         
+        setDuration: function(duration){
+            this.duration = duration;
+        },
+        
         setAudioData : function(data){
             this.audioData = data;
+            //this.mediaPlayer.audioEngine.createNewBufferSource();
             console.log(this.audioData);
         },
         
         getAudioSource : function(){
             return this.audioData;
+        },
+        
+        getFrameCount: function(){
+            return this.frameCount;
+        },
+        
+        getDuration: function(){
+            return this.duration;
         }
 
 };
