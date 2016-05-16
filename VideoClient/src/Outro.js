@@ -1,14 +1,14 @@
     if (typeof exports !== 'undefined') {
         if (typeof module !== 'undefined' && module.exports) {
-            exports = module.exports = VideoPlayer;
+            exports = module.exports = Flare;
         }
-        exports.VideoPlayer = VideoPlayer;
+        exports.Flare = Flare;
     } else if (typeof define !== 'undefined' && define.amd) {
-        define('VideoPlayer', (function() { return root.VideoPlayer = VideoPlayer; })() );
+        define('Flare', (function() { return root.Flare = Flare; })() );
     } else {
-        root.VideoPlayer = VideoPlayer;
+        root.Flare = Flare;
     }
 
-    return VideoPlayer;
+    return Flare;
     
 }).call(this);

@@ -1,8 +1,19 @@
-VideoPlayer.Constants = {
+Flare.CONSTANTS = {
     //Put Constant values here
+    VIDEO_SIZE:{
+        ORIGINAL: 0,
+        FIXED: 1,
+        RESPONSIVE: 2
+    },
     
-    //Examples:
-    REQUEST_CONNECT : 100,
-    RESPONSE_CONNECT : 200
+    VIDEO_SCALE_MODE : {
+        MAINTAIN_ASPECT: 0,
+        FILL: 1
+    },
+    
+    FLARE_MESSAGE_HEADER_LENGTH: 5,
+    
+
+
 
 };

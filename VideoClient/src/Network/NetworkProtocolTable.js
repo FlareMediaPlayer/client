@@ -1,0 +1,2 @@
+
+Flare.NETWORK_PROTOCOL_TABLE = {};

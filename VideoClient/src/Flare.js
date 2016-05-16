@@ -1,8 +1,8 @@
 
 /**
- * @namespace Video Player
+ * @namespace Flare
  */
-var VideoPlayer = VideoPlayer || {
+var Flare = Flare || {
     /**
      * The Version Number
      * @constant
@@ -16,7 +16,7 @@ var VideoPlayer = VideoPlayer || {
      * @constant
      * @type {array}
      */
-    VIDEOS: []
+    PLAYERS: []
     
 };
 
