@@ -432,7 +432,8 @@ Flare.VideoPlayer.prototype = {
     
     setFps: function(fps){
         this.fps = fps;
-    }
+    },
+    
 
     
 

@@ -26,8 +26,8 @@ Flare.NetworkManager = function (mediaPlayer) {
 Flare.NetworkManager.prototype = {
     
     connect: function () {
-
-        this.socket = new WebSocket('ws://localhost:6661');
+        var connectionUrl = 'ws://' + this.mediaPlayer.options.uri + ':' + this.mediaPlayer.options.port;
+        this.socket = new WebSocket(connectionUrl);
         this.socket.binaryType = 'arraybuffer';
     },
     

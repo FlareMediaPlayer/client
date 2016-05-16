@@ -8,6 +8,8 @@ Flare.MediaPlayer = function(userOptions) {
 
 
     this.options = {
+        port : 6661,
+        uri : 'localhost',
         videoID: '',
         container: '',
         //videoPath: '',
@@ -74,6 +76,12 @@ Flare.MediaPlayer.prototype = {
         } else {
             console.log("location is not set");
         }
+        
+        if (typeof userOptions.uri != 'undefined') {
+
+            this.options.uri = userOptions.uri;
+
+        } 
 
     },
 
