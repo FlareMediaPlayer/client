@@ -117,7 +117,9 @@ Flare.VideoPlayer = function(mediaPlayer) {
         position: 'relative',
         overflow: 'hidden',
         width: '960px',
-        height: '540px'
+        height: '540px',
+        display: 'inline-block',
+        'font-family' : 'Arial'
 
     };
 
@@ -199,7 +201,7 @@ Flare.VideoPlayer.prototype = {
         this.settingsPath.setAttributeNS(null, "d", Flare.Icons.settings);
         this.videoPlayer.id = "videoId";
 
-        this.playButton.innerHTML = "&#x025B8;";
+        this.playButton.innerHTML = "&#9658;";
         this.muteButton.innerHTML = "&#9732;";
 
 
@@ -261,8 +263,8 @@ Flare.VideoPlayer.prototype = {
 
 
         var target;
-        var parent = null; //this.mediaPlayer.parent;
-
+        var parent = this.mediaPlayer.options.container;
+        
 
         if (parent) {
             if (typeof parent === 'string') {
@@ -277,7 +279,7 @@ Flare.VideoPlayer.prototype = {
 
             target = document.body;
         }
-
+        console.log(target);
         target.appendChild(this.videoPlayer);
     },
 

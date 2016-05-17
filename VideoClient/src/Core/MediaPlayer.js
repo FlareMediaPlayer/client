@@ -82,6 +82,12 @@ Flare.MediaPlayer.prototype = {
             this.options.uri = userOptions.uri;
 
         } 
+        
+        if (typeof userOptions.container != 'undefined') {
+
+            this.options.container = userOptions.container;
+
+        } 
 
     },
 
