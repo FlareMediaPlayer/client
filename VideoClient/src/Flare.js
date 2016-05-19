@@ -5,6 +5,7 @@
 var Flare = Flare || {
     /**
      * The Version Number
+     * @memberOf Flare
      * @constant
      * @type {string}
      */
@@ -13,6 +14,7 @@ var Flare = Flare || {
     /**
      * An array of video player instances. This way we can add multiple video players without having 
      * to worry about it later.
+     * @memberOf Flare
      * @constant
      * @type {array}
      */

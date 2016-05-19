@@ -1,6 +1,6 @@
 /**
  * class for handling buffering
- * @author Jens
+ * @author Jens Omfjord
  * @memberOf Flare
  * @class Flare.Buffer
  * @constructor

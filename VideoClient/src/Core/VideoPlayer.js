@@ -1,33 +1,133 @@
-Flare.VideoPlayer = function(mediaPlayer) {
+/**
+ * class for handling the canvas element
+ * @author Fredrik Sigvartsen and Brian Parra and Jens Omfjord
+ * @memberOf Flare
+ * @class Flare.VideoPlayer
+ * @constructor
+ * @param {Flare.MediaPlayer} mediaPlayer a reference to the mediaPlayer
+ * @return {Flare.VideoPlayer} returns a Flare VideoPlayer
+ */
+Flare.VideoPlayer = function (mediaPlayer) {
 
 
     /**
-     * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
+     * @property {Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
      */
     this.mediaPlayer = mediaPlayer;
+
+    /**
+     * @property {object} canvas reference to the canvas object
+     */
     this.canvas = null;
+
+    /**
+     * @property {number} videoWidth the video width
+     */
     this.videoWidth;
+
+    /**
+     * @property {number} videoHeight the video height
+     */
     this.videoHeight;
+
+    /**
+     * @property {object} videoPlayer the DOM video player container element
+     */
     this.videoPlayer;
+
+    /**
+     * @property {object} controlBar the wrapper for the bottom control bar
+     */
     this.controlBar;
+
+    /**
+     * @property {object} progressBarContainer the container for the progress bars
+     */
     this.progressBarContainer;
-    
+
+    /**
+     * @property {object} playButton the play button
+     */
     this.playButton;
+
+    /**
+     * @property {object} controlBarInner the inner wrapper for the control bar
+     */
     this.controlBarInner;
+
+    /**
+     * @property {object} leftControls a left floated div for the controls on the left of the bar
+     */
     this.leftControls;
+
+    /**
+     * @property {object} rightControls a left floated div for the controls on the right of the bar
+     */
     this.rightControls;
+
+    /**
+     * @property {object} settingsButton the settings button
+     */
     this.settingsButton;
+
+    /**
+     * @property {string} settingsPath the svg path for the settings button
+     */
     this.settingsPath;
+
+    /**
+     * @property {object} progressBar the bar that shows the timeline progress
+     */
     this.progressBar;
+
+    /**
+     * @property {object} progressBarDisplayGroup wrapper for the different progress bars like buffering and playback
+     */
     this.progressBarDisplayGroup;
+
+    /**
+     * @property {object} loadProgressBar shows buffer status
+     */
     this.loadProgressBar;
+
+    /**
+     * @property {object} playProgress shows play progress in %
+     */
     this.playProgress;
+
+    /**
+     * @property {object} timeDisplay shows formated time display
+     */
     this.timeDisplay;
+
+    /**
+     * @property {object} volumeControl wrapper for volume slider
+     */
     this.volumeControl;
+
+    /**
+     * @property {object} muteButton mute button
+     */
     this.muteButton;
+
+    /**
+     * @property {object} loadingBar shows spinning wheel
+     */
     this.loadingBar;
+
+    /**
+     * @property {boolean} buttonsLocked are the buttons currently locked
+     */
     this.buttonsLocked = false;
+
+    /**
+     * @property {number} durationInMin the duration in min
+     */
     this.durationInMin = 0;
+
+    /**
+     * @property {number} fps the frames per second
+     */
     this.fps;
 
     this.muteButtonStyle = {
@@ -40,7 +140,7 @@ Flare.VideoPlayer = function(mediaPlayer) {
         display: 'inline-block'
 
     };
-    
+
     this.loadProgressBarStyle = {
         position: 'absolute',
         bottom: 0,
@@ -61,7 +161,7 @@ Flare.VideoPlayer = function(mediaPlayer) {
     };
 
     this.playProgressStyle = {
-        'z-index' : 2,
+        'z-index': 2,
         position: 'absolute',
         bottom: 0,
         left: '0px',
@@ -119,12 +219,11 @@ Flare.VideoPlayer = function(mediaPlayer) {
         width: '960px',
         height: '540px',
         display: 'inline-block',
-        'font-family' : 'Arial'
+        'font-family': 'Arial'
 
     };
 
     this.controlBarInnerStyle = {
-
     };
 
     this.controlBarStyle = {
@@ -174,8 +273,12 @@ Flare.VideoPlayer = function(mediaPlayer) {
 };
 
 Flare.VideoPlayer.prototype = {
-
-    boot: function() {
+    /**
+     * Boots up the VideoPlayer and creates the Dom Elements
+     * @memberof Flare.VideoPlayer.prototype
+     * @function boot
+     */
+    boot: function () {
 
         this.videoPlayer = document.createElement("div");
         this.loadingBar = document.createElement("div");
@@ -195,7 +298,7 @@ Flare.VideoPlayer.prototype = {
         this.timeDisplay = document.createElement("div");
         this.settingsButton = document.createElement("svg");
         this.settingsPath = document.createElementNS('http://www.w3.org/2000/svg', "path");
-        
+
 
 
         this.settingsPath.setAttributeNS(null, "d", Flare.Icons.settings);
@@ -222,7 +325,7 @@ Flare.VideoPlayer.prototype = {
         this.setStyle(this.muteButton, this.muteButtonStyle);
         this.setStyle(this.loadingBar, this.loadingBarStyle);
         this.setStyle(this.loadProgressBar, this.loadProgressBarStyle);
-        
+
 
         this.setAttributes(this.progressBar, this.progressBarAttribtues);
 
@@ -264,7 +367,7 @@ Flare.VideoPlayer.prototype = {
 
         var target;
         var parent = this.mediaPlayer.options.container;
-        
+
 
         if (parent) {
             if (typeof parent === 'string') {
@@ -282,30 +385,39 @@ Flare.VideoPlayer.prototype = {
         console.log(target);
         target.appendChild(this.videoPlayer);
     },
-
-
-
-    update: function(videoTime) {
+    /**
+     * On each update (hopefully 60fps) update the UI
+     * @memberof Flare.VideoPlayer.prototype
+     * @function update
+     * @param {number} the current time of the video
+     */
+    update: function (videoTime) {
         //calculate which frame number, get that frame from buffer
         //video time is in ms
-        var progress = (videoTime/1000) / this.mediaPlayer.buffer.getDuration();
-        
-        if(progress >= 1.0){
+        var progress = (videoTime / 1000) / this.mediaPlayer.buffer.getDuration();
+
+        if (progress >= 1.0) {
             this.mediaPlayer.finishPlayback();
             return;
         }
-        
-        var frameNumber = Math.floor((videoTime/1000) * this.fps);
+
+        var frameNumber = Math.floor((videoTime / 1000) * this.fps);
         //console.log(progress + "progress");
         //console.log (frameNumber + "frame num");
         this.canvas.render(this.mediaPlayer.buffer.getFrameAt(frameNumber));
-        
+
         this.updatePlayProgress(progress);
         this.updateTimeDisplay(videoTime);
 
     },
-
-    setStyle: function(element, attributes) {
+    /**
+     * Utility function for setting styles of an element
+     * @memberof Flare.VideoPlayer.prototype
+     * @function setStyle
+     * @param {object} element Dom element to add styles to
+     * @param {array} attributes attributes to add 
+     */
+    setStyle: function (element, attributes) {
 
         for (var attribute in attributes) {
             element.style.setProperty(attribute, attributes[attribute]);
@@ -313,41 +425,70 @@ Flare.VideoPlayer.prototype = {
 
 
     },
-
-    setAttributes: function(element, attributes) {
+    /**
+     * Utility function for setting attributes of an element
+     * @memberof Flare.VideoPlayer.prototype
+     * @function setAttributes
+     * @param {object} element Dom element to add attributes to
+     * @param {array} attributes attributes to add 
+     */
+    setAttributes: function (element, attributes) {
 
         for (var attribute in attributes) {
             element.setAttribute(attribute, attributes[attribute]);
         }
     },
-
-
-
-    updatePlayProgress: function(progress) {
+    /**
+     * Updates the progress in the timeline display
+     * @memberof Flare.VideoPlayer.prototype
+     * @function updatePlayProgress
+     * @param {number} progress the progress in %
+     */
+    updatePlayProgress: function (progress) {
         this.playProgress.style.setProperty("transform", "scaleX(" + progress + ")");
         this.progressBar.setAttribute("aria-valuenow", parseInt(progress * 100));
     },
-    
-    updateLoadProgress: function(progress) {
+    /**
+     * Updates the progress in the buffering display
+     * @memberof Flare.VideoPlayer.prototype
+     * @function updateLoadProgress
+     * @param {number} progress the progress in %
+     */
+    updateLoadProgress: function (progress) {
         this.loadProgressBar.style.setProperty("transform", "scaleX(" + progress + ")");
         //this.progressBar.setAttribute("aria-valuenow", parseInt(progress * 100));
     },
-
-    handleMouseDown: function(e) {
+    /**
+     * Bind callback for mouse down on timeline
+     * @memberof Flare.VideoPlayer.prototype
+     * @function handleMouseDown
+     * @param {object} e the mouse event
+     */
+    handleMouseDown: function (e) {
         console.log(e);
         var currentProgress = parseInt(this.progressBar.getAttribute('aria-valuenow'));
         this.mediaPlayer.isPlaying = false;
 
         return false;
     },
-
-    handleDragStart: function(e) {
+    /**
+     * Bind callback for mouse drag starts
+     * @memberof Flare.VideoPlayer.prototype
+     * @function handleDragStart
+     * @param {object} e the mouse event
+     */
+    handleDragStart: function (e) {
 
         console.log(e);
 
     },
-
-    handleDrag: function(e) {
+    /**
+     * Bind callback for mouse drag. Use this for dragging the timeline and repositioning playback
+     * @memberof Flare.VideoPlayer.prototype
+     * @function handleDrag
+     * @param {object} e the mouse event
+     */
+    handleDrag: function (e) {
 
         //Make new indicator to show the drag location
 
@@ -359,15 +500,25 @@ Flare.VideoPlayer.prototype = {
         console.log(e);
 
     },
-
-    handleDragEnd: function(e) {
+    /**
+     * Bind callback for mouse drag ends, start playing again if was previously playing
+     * @memberof Flare.VideoPlayer.prototype
+     * @function handleDragEnd
+     * @param {object} e the mouse event
+     */
+    handleDragEnd: function (e) {
 
         //if in play mode, continue playing from new location
         //buffer if neccessary
 
     },
-
-    handlePlayButtonPress: function(e) {
+    /**
+     * Bind callback for play button. Toggle playback here
+     * @memberof Flare.VideoPlayer.prototype
+     * @function handlePlayButtonPress
+     * @param {object} e the mouse event
+     */
+    handlePlayButtonPress: function (e) {
         console.log("play clicked");
         this.mediaPlayer.togglePlay();
 
@@ -378,35 +529,67 @@ Flare.VideoPlayer.prototype = {
         }
 
     },
-
-    updateTimeDisplay: function(videoTime) {
-        this.timeDisplay.innerHTML = this.formatTimeFromMiliSeconds(videoTime)+ " / " + this.durationInMin;    
+    /**
+     * Updates the numerical time display in formated min/sec
+     * @memberof Flare.VideoPlayer.prototype
+     * @function handlePlayButtonPress
+     * @param {number} videoTime the time in the video
+     */
+    updateTimeDisplay: function (videoTime) {
+        this.timeDisplay.innerHTML = this.formatTimeFromMiliSeconds(videoTime) + " / " + this.durationInMin;
     },
-    
-    formatTimeFromSeconds:function (timeInSeconds){
+    /**
+     * Utility function to format time in seconds into a string
+     * @memberof Flare.VideoPlayer.prototype
+     * @function formatTimeFromSeconds
+     * @param {number} timeInSeconds video time in seconds
+     * @return {string} formated time
+     */
+    formatTimeFromSeconds: function (timeInSeconds) {
         var totalSeconds = Math.floor(timeInSeconds);
-        var min =  Math.floor(totalSeconds/60);
-        var seconds = totalSeconds%60;
+        var min = Math.floor(totalSeconds / 60);
+        var seconds = totalSeconds % 60;
         var formattedTime = this.formatDigits(min) + ":" + this.formatDigits(seconds);
-        
+
         return formattedTime;
     },
-    
-    formatTimeFromMiliSeconds:function (timeInMs){
-        return this.formatTimeFromSeconds(timeInMs/1000);
+    /**
+     * Utility function to format time in ms into a string
+     * @memberof Flare.VideoPlayer.prototype
+     * @function formatTimeFromMiliSeconds
+     * @param {number} timeInMS video time in ms
+     * @return {string} formated time
+     */
+    formatTimeFromMiliSeconds: function (timeInMs) {
+        return this.formatTimeFromSeconds(timeInMs / 1000);
     },
-    
-    formatDigits: function(time){
+    /**
+     * Utility function to format the leading 0
+     * @memberof Flare.VideoPlayer.prototype
+     * @function formatDigits
+     * @param {number} time to format
+     * @return {string} formated time with leading 0 if single digit
+     */
+    formatDigits: function (time) {
         if (time > 9)
             return time
-        else return "0" + time;
+        else
+            return "0" + time;
     },
-
-    removeLoadingBar: function(){
+    /**
+     * Removes loading animation once loaded
+     * @memberof Flare.VideoPlayer.prototype
+     * @function removeLoadingBar
+     */
+    removeLoadingBar: function () {
         this.videoPlayer.removeChild(this.loadingBar);
     },
-
-    toggleLockingButtons: function() {
+    /**
+     * Locks and unlocks the ui buttons
+     * @memberof Flare.VideoPlayer.prototype
+     * @function toggleLockingButtons
+     */
+    toggleLockingButtons: function () {
         if (this.buttonsLocked) {
             this.playButton.removeAttribute("disabled");
             this.muteButton.removeAttribute("disabled");
@@ -424,24 +607,25 @@ Flare.VideoPlayer.prototype = {
             this.buttonsLocked = true;
         }
     },
-    
-    setDuration: function(duration){
+    /**
+     * Sets the duration of the video 
+     * @memberof Flare.VideoPlayer.prototype
+     * @function setDuration
+     * @param {number} duration duration in seconds
+     */
+    setDuration: function (duration) {
         console.log(this.formatTimeFromSeconds(duration) + "loading");
         this.durationInMin = this.formatTimeFromSeconds(duration);
         this.updateTimeDisplay(0);
-        
+
     },
-    
-    setFps: function(fps){
+    /**
+     * Sets the fps
+     * @param {number} fps frames per second
+     */
+    setFps: function (fps) {
         this.fps = fps;
     },
-    
-
-    
-
-
-
-
 };
 
 Flare.VideoPlayer.prototype.constructor = Flare.VideoPlayer;

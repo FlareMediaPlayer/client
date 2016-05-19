@@ -1,3 +1,10 @@
+/**
+ * Flare Default Constants
+ * @author Brian Parra
+ * @memberOf Flare
+ * @type {object}
+ * @constant
+ */
 Flare.CONSTANTS = {
     //Put Constant values here
     VIDEO_SIZE:{

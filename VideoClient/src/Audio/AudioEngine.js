@@ -1,10 +1,11 @@
 /**
  * class for handling audio engine
- * @author Fredrik
+ * @author Fredrik Sigvartsen
  * @memberOf Flare
  * @class Flare.AudioEngine
  * @constructor
- * @param {MediaPlayer} mediaPlayer a reference to the mediaPlayer
+ * @param {Flare.MediaPlayer} mediaPlayer a reference to the mediaPlayer
+ * @return {Flare.AudioEngine} returns a Flare AudioEngine
  */
 
 Flare.AudioEngine = function (mediaPlayer) {
@@ -45,7 +46,6 @@ Flare.AudioEngine.prototype = {
      * Initializes the audio engine
      * @memberof Flare.AudioEngine.prototype
      * @function boot
-     * 
      */
     boot: function () {
         //this.mute = document.querySelector('.muteButton');
@@ -91,7 +91,7 @@ Flare.AudioEngine.prototype = {
 
 
         this.playing = true;
-        
+
     },
     /**
      * Stops playback
@@ -106,7 +106,7 @@ Flare.AudioEngine.prototype = {
 
         this.source.stop();
         this.playing = false;
-        
+
     },
     /**
      * toggles playback time
@@ -116,10 +116,10 @@ Flare.AudioEngine.prototype = {
      * @param {number} time offset to toggle at
      */
     toggle: function (time) {
-        
+
         this.playing ? this.stop(time) : this.play(time);
         this.playing = !this.playing;
-        
+
     },
     /**
      * mutes the audio
@@ -128,7 +128,7 @@ Flare.AudioEngine.prototype = {
      * @function muteAudio
      */
     muteAudio: function () {
-        
+
         if (this.mute.id != "activated") {
             this.gainNode.gainvalue = 0; //Muting
             this.mute.id = "activated";
@@ -138,7 +138,7 @@ Flare.AudioEngine.prototype = {
             this.mute.id = "deactivated";
             this.mute.innerHTML = "Mute";
         }
-        
+
     },
     /**
      * Canges the audio volume
@@ -148,12 +148,12 @@ Flare.AudioEngine.prototype = {
      * @param {rangeElement} rangeElement range of volume slider
      */
     changeVolume: function (rangeElement) {
-        
+
         var volume = element.value;
         var portion = parseInt(volume) / parseInt(element.max);
 
         this.gainNode.gain.value = portion * portion;
-        
+
     }
 };
 

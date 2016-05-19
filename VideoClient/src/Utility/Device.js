@@ -1,26 +1,76 @@
-Flare.Device = function() {
-/******************************
-* Author: Fredrik
-* last edited: May 8th, 2016
-*******************************/
+/**
+ * class for handling device specific apis
+ * @author Fredrik
+ * @memberOf Flare
+ * @class Flare.AudioEngine
+ * @constructor
+ */
 
-   this.deviceReadyAt = 0;
+Flare.Device = function () {
 
+    /*
+     * @property {number} deviceReadyAt time device was initialized at
+     */
+    this.deviceReadyAt = 0;
+
+    /*
+     * @property {boolean} initialized if the device has initialized
+     */
     this.initialized = false;
+
+    /**
+     * @property {boolean} isCompatible is the current device compatible
+     */
     this.isCompatible = false;
-    //  Features
+
+    /**
+     * @property {boolean} hasGeneralInputTypes does this device have inputs
+     */
     this.hasGeneralInputTypes = false;
+
+    /**
+     * @property {boolean} hasCanvas is the canvas available
+     */
     this.hasCanvas = false;
+
+    /**
+     * @property {boolean} hasWebGL does the device have WebGl
+     */
     this.hasWebGL = false;
+
+    /**
+     * @property {boolean} does the device have File reading/writing capabilities
+     */
     this.hasFile = false;
+
+    /**
+     * @property {boolean} hasLocalStorage can store local data
+     */
     this.hasLocalStorage = false;
+
+    /**
+     * @property {boolean} hasTypedArray is typed array available
+     */
     this.hasTypedArray = false;
-    //  Input
+
+    /**
+     * @property {boolean} hasTouch is touch input available
+     */
     this.hasTouch = false;
-    //  Audio
+
+    /**
+     * @property {boolean} hasWebAudio is webAudio available
+     */
     this.hasWebAudio = false;
-    // Device features
+
+    /**
+     * @property {boolean} fullscreen  is fullscreen available
+     */
     this.fullscreen = false;
+
+    /**
+     * @property {boolean} webSocket is websocket available
+     */
     this.webSocket = false;
 };
 
@@ -29,11 +79,19 @@ Flare.Device = function() {
 Flare.Device = new Flare.Device();
 
 
-Flare.Device._initialize = function() {
+/**
+ * All device initialization goes here, including feature checking
+ * @memberof Flare.Device
+ * @function _initialize
+ */
+Flare.Device._initialize = function () {
+
 
     function supportsCanvas() {
+
         var c = document.createElement('canvas');
         return !!c.getContext;
+
     }
 
     function supportsWebAudio() {
@@ -133,10 +191,17 @@ Flare.Device._initialize = function() {
     var range = supportsInput("range");
     this.hasGeneralInputTypes = range; // Can do hasFile too
     this.isCompatible = this.hasCanvas && this.hasGeneralInputTypes
-        && this.webSocket && this.hasWebAudio;
+            && this.webSocket && this.hasWebAudio;
 };
 
-Flare.Device.whenReady = function(callback, context) {
+/**
+ * sets up Callback after device is detected to be ready, triggers the rest of the initialization
+ * @memberof Flare.Device
+ * @function whenReady
+ * @param {function} callback function to callback after ready
+ * @param {object} context context of the callback
+ */
+Flare.Device.whenReady = function (callback, context) {
 
     var readyCheck = this._readyCheck;
 
@@ -168,7 +233,12 @@ Flare.Device.whenReady = function(callback, context) {
     }
 };
 
-Flare.Device._readyCheck = function() {
+/**
+ * Keeps checkign to see if DOM is fully loaded and ready 
+ * @memberof Flare.Device
+ * @function _readyCheck
+ */
+Flare.Device._readyCheck = function () {
 
     var readyCheck = this._readyCheck;
 

@@ -39,6 +39,7 @@
 var Flare = Flare || {
     /**
      * The Version Number
+     * @memberOf Flare
      * @constant
      * @type {string}
      */
@@ -47,6 +48,7 @@ var Flare = Flare || {
     /**
      * An array of video player instances. This way we can add multiple video players without having 
      * to worry about it later.
+     * @memberOf Flare
      * @constant
      * @type {array}
      */
@@ -55,6 +57,13 @@ var Flare = Flare || {
 };
 
 
+/**
+ * Flare Default Constants
+ * @author Brian Parra
+ * @memberOf Flare
+ * @type {object}
+ * @constant
+ */
 Flare.CONSTANTS = {
     //Put Constant values here
     VIDEO_SIZE:{
@@ -75,28 +84,50 @@ Flare.CONSTANTS = {
 
 };
 
+/**
+ * Class for handeling initialization of video metadata
+ * @author Brian Parra
+ * @memberOf Flare
+ * @class Flare.InitializeVideoTask
+ * @constructor
+ * @return {Flare.InitializeVideoTask} returns a Flare InitializeVideoTask
+ */
 
-Flare.InitializeVideoTask= function () {
+Flare.InitializeVideoTask = function () {
 
 
     /**
-    * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
-    */
-   
+     * @property {object} data the raw incoming data
+     */
     this.data;
+
+    /**
+     * @property {object} dataView the dataview created to navigate data
+     */
     this.dataView;
+
+    /**
+     * @property {number} flareOpCode this is the flare opcode in the message
+     */
     this.flareOpCode;
+
+    /**
+     * @property {Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
+     */
     this.mediaPlayer;
-    
+
 
     return this;
-    
-    
-    
-    
+
 };
 
-Flare.InitializeVideoTask.prototype.setData = function(data) {
+/**
+ * Sets the binary data recieved from message
+ * @memberof Flare.InitializeVideoTask.prototype
+ * @function setData
+ * @param {object} data binary array of data
+ */
+Flare.InitializeVideoTask.prototype.setData = function (data) {
 
     this.data = data;
     this.dataView = new DataView(this.data);
@@ -107,185 +138,254 @@ Flare.InitializeVideoTask.prototype.setData = function(data) {
     this.height = 0;
     this.fps = 0;
     this.duration = 0;
-    
+
 };
 
-Flare.InitializeVideoTask.prototype.setMediaPlayer = function(mediaPlayer) {
+
+/**
+ * Sets media player reference
+ * @memberof Flare.InitializeVideoTask.prototype
+ * @function setMediaPlayer
+ * @param {Flare.MediaPlayer} mediaPlayer reference to the media player
+ */
+Flare.InitializeVideoTask.prototype.setMediaPlayer = function (mediaPlayer) {
 
     this.mediaPlayer = mediaPlayer;
-    
+
 };
 
-
-Flare.InitializeVideoTask.prototype.process = function() {
+/**
+ * Processess the message recieved
+ * @memberof Flare.InitializeVideoTask.prototype
+ * @function process
+ */
+Flare.InitializeVideoTask.prototype.process = function () {
 
     var dataLength = this.dataView.getInt32(1);
     var videoIsAvailable = this.dataView.getInt8(5);
     console.log("the video you requested is " + this.mediaPlayer.options.videoID);
     //console.log(videoIsAvailable);
-    
-    if(videoIsAvailable === 1){
-       this.videoIsAvailable = true;
-       this.width = this.dataView.getInt32(6);
-       this.height = this.dataView.getInt32(10);
-       this.fps = this.dataView.getFloat64(14);
-       this.duration = this.dataView.getFloat64(22);
-       this.frameCount = this.dataView.getInt32(30);
-       console.log(this.width + " width" );
-       console.log(this.height + " height " );
-       console.log(this.fps + " fps " );
-       console.log(this.duration + " duration " );
-       console.log(this.frameCount + "frame Count");
-       
-   
-       this.mediaPlayer.buffer.initFrameBuffer(this.frameCount, this.fps , this.duration); //Swap out for dynamic buffer and frame rate later
-       this.mediaPlayer.videoPlayer.setDuration(this.duration);
-       this.mediaPlayer.videoPlayer.setFps(this.fps);
-       
-       console.log("video is available!");
-    }else{
+
+    if (videoIsAvailable === 1) {
+        this.videoIsAvailable = true;
+        this.width = this.dataView.getInt32(6);
+        this.height = this.dataView.getInt32(10);
+        this.fps = this.dataView.getFloat64(14);
+        this.duration = this.dataView.getFloat64(22);
+        this.frameCount = this.dataView.getInt32(30);
+        console.log(this.width + " width");
+        console.log(this.height + " height ");
+        console.log(this.fps + " fps ");
+        console.log(this.duration + " duration ");
+        console.log(this.frameCount + "frame Count");
+
+
+        this.mediaPlayer.buffer.initFrameBuffer(this.frameCount, this.fps, this.duration); //Swap out for dynamic buffer and frame rate later
+        this.mediaPlayer.videoPlayer.setDuration(this.duration);
+        this.mediaPlayer.videoPlayer.setFps(this.fps);
+
+        console.log("video is available!");
+    } else {
         console.log("video is not available!");
     }
 
-    
-    
-    
+
+
+
 };
 
 Flare.InitializeVideoTask.prototype.constructor = Flare.InitializeVideoTask;
-
-Flare.ProcessAudioTask= function () {
+/**
+ * Class for handeling incoming audio data
+ * @author Brian Parra 
+ * @memberOf Flare
+ * @class Flare.ProcessAudioTask
+ * @constructor
+ * @return {Flare.ProcessAudioTask} returns a Flare ProcessAudioTask
+ */
+Flare.ProcessAudioTask = function () {
 
 
     /**
-    * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
-    */
-   
+     * @property {object} data the raw incoming data
+     */
     this.data;
+
+    /**
+     * @property {object} dataView the dataview created to navigate data
+     */
     this.dataView;
+
+    /**
+     * @property {number} flareOpCode this is the flare opcode in the message
+     */
     this.flareOpCode;
+
+    /**
+     * @property {Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
+     */
     this.mediaPlayer;
-    
+
+
 
     return this;
-    
-    
-    
-    
+
+
+
+
 };
 
-Flare.ProcessAudioTask.prototype.setData = function(data) {
+
+/**
+ * Sets the binary data recieved from message
+ * @memberof Flare.ProcessAudioTask.prototype
+ * @function setData
+ * @param {object} data binary array of data
+ */
+Flare.ProcessAudioTask.prototype.setData = function (data) {
 
     this.data = data;
     this.dataView = new DataView(this.data);
     this.flareOpCode = Flare.OpCode.FRAME;
     this.videoIsAvailable = false;
-    
+
 };
 
-Flare.ProcessAudioTask.prototype.setMediaPlayer = function(mediaPlayer) {
+/**
+ * Sets media player reference
+ * @memberof Flare.ProcessAudioTask.prototype
+ * @function setMediaPlayer
+ * @param {Flare.MediaPlayer} mediaPlayer reference to the media player
+ */
+Flare.ProcessAudioTask.prototype.setMediaPlayer = function (mediaPlayer) {
 
     this.mediaPlayer = mediaPlayer
-    
+
 };
 
-
-Flare.ProcessAudioTask.prototype.process = function() {
+/**
+ * Processess the message recieved
+ * @memberof Flare.ProcessAudioTask.prototype
+ * @function process
+ */
+Flare.ProcessAudioTask.prototype.process = function () {
 
     var dataLength = this.dataView.getInt32(0);
-    
-    
-    
-    //This way is probably super slow!!!!
-    //var blob = new Blob([this.data.slice(5)], { type: 'audio/m4a' });
-    //var urlCreator = window.URL || window.webkitURL;
-    //var audioUrl = urlCreator.createObjectURL( blob );
-    
+
+
     this.mediaPlayer.buffer.setAudioData(this.data.slice(5));
-    //this.mediaPlayer.audioEngine.init();
 
-           
-    
-
-
-    
-    
-    
 };
 
 Flare.ProcessAudioTask.prototype.constructor = Flare.ProcessAudioTask;
 
-Flare.ProcessFrameTask= function () {
+/**
+ * Class for handeling incoming Frame Data
+ * @author Brian Parra
+ * @memberOf Flare
+ * @class Flare.ProcessFrameTask
+ * @constructor
+ * @return {Flare.ProcessFrameTask} returns a Flare ProcessFrameTask
+ */
+
+Flare.ProcessFrameTask = function () {
 
 
     /**
-    * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
-    */
-   
+     * @property {object} data the raw incoming data
+     */
     this.data;
+
+    /**
+     * @property {object} dataView the dataview created to navigate data
+     */
     this.dataView;
+
+    /**
+     * @property {number} flareOpCode this is the flare opcode in the message
+     */
     this.flareOpCode;
+
+    /**
+     * @property {Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
+     */
     this.mediaPlayer;
-    
 
     return this;
-    
-    
-    
-    
+
+
+
+
 };
 
-Flare.ProcessFrameTask.prototype.setData = function(data) {
+/**
+ * Sets the binary data recieved from message
+ * @memberof Flare.ProcessFrameTask.prototype
+ * @function setData
+ * @param {object} data binary array of data
+ */
+Flare.ProcessFrameTask.prototype.setData = function (data) {
 
     this.data = data;
     this.dataView = new DataView(this.data);
     this.flareOpCode = Flare.OpCode.FRAME;
     this.videoIsAvailable = false;
-    
+
 };
 
-Flare.ProcessFrameTask.prototype.setMediaPlayer = function(mediaPlayer) {
+/**
+ * Sets media player reference
+ * @memberof Flare.ProcessFrameTask.prototype
+ * @function setMediaPlayer
+ * @param {Flare.MediaPlayer} mediaPlayer reference to the media player
+ */
+Flare.ProcessFrameTask.prototype.setMediaPlayer = function (mediaPlayer) {
 
     this.mediaPlayer = mediaPlayer
-    
+
 };
 
-
-Flare.ProcessFrameTask.prototype.process = function() {
+/**
+ * Processess the message recieved
+ * @memberof Flare.ProcessFrameTask.prototype
+ * @function process
+ */
+Flare.ProcessFrameTask.prototype.process = function () {
 
     var dataLength = this.dataView.getInt32(0);
     var index = this.dataView.getUint32(5);
-    
-    
+
+
     //This way is probably super slow!!!!
     var img = new Image;
-    var blob = new Blob([this.data.slice(9)], { type: 'image/jpg' });
+    var blob = new Blob([this.data.slice(9)], {type: 'image/jpg'});
     var urlCreator = window.URL || window.webkitURL;
-    var imageUrl = urlCreator.createObjectURL( blob );
+    var imageUrl = urlCreator.createObjectURL(blob);
     img.src = imageUrl;
     //console.log("frame " +index + "loaded");
-  
- 
 
-           
+
+
+
     this.mediaPlayer.buffer.setFrameAt(index, img);
- 
-    
 
 
-    
-    
-    
+
+
+
+
+
 };
 
 Flare.ProcessFrameTask.prototype.constructor = Flare.ProcessFrameTask;
 /**
  * class for handling audio engine
- * @author Fredrik
+ * @author Fredrik Sigvartsen
  * @memberOf Flare
  * @class Flare.AudioEngine
  * @constructor
- * @param {MediaPlayer} mediaPlayer a reference to the mediaPlayer
+ * @param {Flare.MediaPlayer} mediaPlayer a reference to the mediaPlayer
+ * @return {Flare.AudioEngine} returns a Flare AudioEngine
  */
 
 Flare.AudioEngine = function (mediaPlayer) {
@@ -326,7 +426,6 @@ Flare.AudioEngine.prototype = {
      * Initializes the audio engine
      * @memberof Flare.AudioEngine.prototype
      * @function boot
-     * 
      */
     boot: function () {
         //this.mute = document.querySelector('.muteButton');
@@ -372,7 +471,7 @@ Flare.AudioEngine.prototype = {
 
 
         this.playing = true;
-        
+
     },
     /**
      * Stops playback
@@ -387,7 +486,7 @@ Flare.AudioEngine.prototype = {
 
         this.source.stop();
         this.playing = false;
-        
+
     },
     /**
      * toggles playback time
@@ -397,10 +496,10 @@ Flare.AudioEngine.prototype = {
      * @param {number} time offset to toggle at
      */
     toggle: function (time) {
-        
+
         this.playing ? this.stop(time) : this.play(time);
         this.playing = !this.playing;
-        
+
     },
     /**
      * mutes the audio
@@ -409,7 +508,7 @@ Flare.AudioEngine.prototype = {
      * @function muteAudio
      */
     muteAudio: function () {
-        
+
         if (this.mute.id != "activated") {
             this.gainNode.gainvalue = 0; //Muting
             this.mute.id = "activated";
@@ -419,7 +518,7 @@ Flare.AudioEngine.prototype = {
             this.mute.id = "deactivated";
             this.mute.innerHTML = "Mute";
         }
-        
+
     },
     /**
      * Canges the audio volume
@@ -429,32 +528,39 @@ Flare.AudioEngine.prototype = {
      * @param {rangeElement} rangeElement range of volume slider
      */
     changeVolume: function (rangeElement) {
-        
+
         var volume = element.value;
         var portion = parseInt(volume) / parseInt(element.max);
 
         this.gainNode.gain.value = portion * portion;
-        
+
     }
 };
 
 Flare.AudioEngine.prototype.constructor = Flare.AudioEngine;
-
+/**
+ * class for handling buffering
+ * @author Jens Omfjord
+ * @memberOf Flare
+ * @class Flare.Buffer
+ * @constructor
+ * @param {MediaPlayer} mediaPlayer a reference to the mediaPlayer
+ */
 Flare.Buffer= function (mediaPlayer) {
 
 
     /**
-    * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
+    * @property {Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
     */
-   
-    
-   
+
     this.mediaPlayer = mediaPlayer;
     
-    this.testFrame =  null;
-
+    /*
+     * @property {number} channels number of audio channels
+     */
     this.channels = 2 //Stereo for now
 
+    
     this.frame_count = this.mediaPlayer.audioCtx.sampleRate = 2.0;
 
     this.audio_buffer = this.mediaPlayer.audioCtx.createBuffer(this.channels, this.frame_count, this.mediaPlayer.audioCtx.sampleRate);
@@ -565,26 +671,49 @@ Flare.Buffer.prototype = {
 };
 
 Flare.Buffer.prototype.constructor = Flare.Buffer;
+/**
+ * class for handling the canvas element
+ * @author Fredrik Sigvartsen and Brian Parra
+ * @memberOf Flare
+ * @class Flare.Canvas
+ * @constructor
+ * @param {Flare.MediaPlayer} mediaPlayer a reference to the mediaPlayer
+ * @return {Flare.Canvas} returns a Flare Canvas
+ */
 
 Flare.Canvas = function (videoPlayer) {
 
     /**
-     * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
+     * @property {Flare.VideoPlayer} mediaPlayer - A reference to the video player.
      */
-    //this.mediaPlayer = mediaPlayer;
     this.videoPlayer = videoPlayer;
 
-
-    //Private canvas element
+    /**
+     * @property {element} canvas the canvas element
+     */
     this.canvas = document.createElement('canvas');
+
+    /**
+     * @param {object} ctx the 2d canvas context
+     */
     this.ctx = this.canvas.getContext("2d");
 
-    this.canvas.id ="testId" ;//mediaPlayer.id;
+    /**
+     * @param {string} id the canvas id
+     */
+    this.canvas.id = "testId";//mediaPlayer.id;
 
-    //for now hard code
+    /**
+     * @param {number} width the canvas width
+     */
     this.canvas.width = 960;
+
+    /**
+     * @param {number} height the canvas height
+     */
     this.canvas.height = 540;
-    
+
+
     this.canvas.style.display = 'block';
     this.canvas.style.backgroundColor = 'black';
 
@@ -595,35 +724,55 @@ Flare.Canvas = function (videoPlayer) {
 };
 
 Flare.Canvas.prototype = {
-    
-    render: function(frame){
-        
-        this.ctx.drawImage(frame, 0 ,0);
+    /**
+     * Renders the passed frame to canvas
+     * @memberof Flare.Canvas.prototype
+     * @function createNewBufferSource
+     * @param {object} frame image data to draw
+     */
+    render: function (frame) {
+
+        this.ctx.drawImage(frame, 0, 0);
         //RENDER LOGIC GOES HERE
         //THE ARGUMENT IS THE FULLY RENDERED FRAME, JUST NEED TO PAINT TO THE CANVAS  
-        
+
     },
-    
-    getCanvas: function(){
-        
+    /**
+     * Returns the canvas element
+     * @memberof Flare.Canvas.prototype
+     * @function createNewBufferSource
+     * @return {object} the canvas
+     */
+    getCanvas: function () {
+
         return this.canvas;
-        
+
     }
 };
 
 Flare.Canvas.prototype.constructor = Flare.Canvas;
-Flare.MediaPlayer = function(userOptions) {
+/**
+ * This is the main Media Player class one single media player can be either an audio only, or video and audio player
+ * @author Jens Omfjord and Brian Parra
+ * @memberOf Flare
+ * @class Flare.MediaPlayer
+ * @constructor
+ * @param {object} userOptions the passed in user options
+ * @return {Flare.MediaPlayer} returns a Flare MediaPlayer
+ */
+Flare.MediaPlayer = function (userOptions) {
 
     /**
      * @property {number} id - video player id, for handling multiple MediaPlayer Objects
-     * @readonly
      */
     this.id = Flare.PLAYERS.push(this) - 1;
 
-
+    /**
+     * @property {object} options these are the default options which the user can override
+     */
     this.options = {
-        port : 6661,
-        uri : 'localhost',
+        port: 6661,
+        uri: 'localhost',
         videoID: '',
         container: '',
         //videoPath: '',
@@ -634,34 +783,79 @@ Flare.MediaPlayer = function(userOptions) {
 
     }; //Default options
 
+
     this.parseOptions(userOptions);
 
-    this.parent = "parent";
-
-    //Filling out some basic properties we might need
-    //DONT FORGET TO DO COMMENTS LATER
 
 
-
-    this.url = null;
-    this.frameWidth = null;
-    this.frameHeight = null;
+    /**
+     * @property {object} _networkManager internal reference to network manager
+     */
     this._networkManager = null; //Not sure if public or private yet
-    this._forceUpdate;
+
+    /**
+     * @property {boolean} isBooted is the media player fully booted
+     */
     this.isBooted = null;
+
+    /**
+     * @property {object} oscillator reference to an oscillator
+     */
     this.oscillator = null;
+
+    /**
+     * @property {object} videoPlayer reference to the video player object
+     */
     this.videoPlayer = null;
+
+    /**
+     * @property {object} audioEngine reference to an audio engine
+     */
     this.audioEngine = null;
+
+    /**
+     * @property {object} buffer reference to the buffer
+     */
     this.buffer = null;
+
+    /**
+     * @property {object} audioCtx reference to audio context
+     */
     this.audioCtx = null;
+
+    /**
+     * @property {boolean} isPlaying is the media player currently in play mode
+     */
     this.isPlaying = false;
 
-    this.testCounter = 0;
+    /**
+     * @property {number} timeStarted time at which playback started
+     */
     this.timeStarted = 0;
+
+    /**
+     * @property {number} totalTimePaused elapsed time while not in play mode after starting
+     */
     this.totalTimePaused = 0;
+
+    /**
+     * @property {number} numPressedPlay a number for keeping track of toggling the play button
+     */
     this.numPressedPlay = 0;
+
+    /**
+     * @property {number} deltaTime the difference in time since lased updated
+     */
     this.deltaTime;
+
+    /**
+     * @property {number} timePaused time since paused
+     */
     this.timePaused = 0;
+
+    /**
+     * @property {boolean} donePlaying has playback reached end of timeline
+     */
     this.donePlaying = false;
 
 
@@ -679,8 +873,13 @@ Flare.MediaPlayer = function(userOptions) {
 };
 
 Flare.MediaPlayer.prototype = {
-
-    parseOptions: function(userOptions) {
+    /**
+     * Parses the user options
+     * @memberof Flare.MediaPlayer.prototype
+     * @function parseOptions
+     * @param {object} userOptions These are the options passed in when initializing a flare media player
+     */
+    parseOptions: function (userOptions) {
         //REMEMBER TO SANITIZE USER INPUT
         console.log(userOptions);
         if (typeof userOptions.videoID != 'undefined') {
@@ -690,28 +889,31 @@ Flare.MediaPlayer.prototype = {
         } else {
             console.log("location is not set");
         }
-        
+
         if (typeof userOptions.uri != 'undefined') {
 
             this.options.uri = userOptions.uri;
 
-        } 
-        
+        }
+
         if (typeof userOptions.container != 'undefined') {
 
             this.options.container = userOptions.container;
 
-        } 
+        }
 
     },
-
-    boot: function() {
+    /**
+     * Boots up the entire media player
+     * @memberof Flare.MediaPlayer.prototype
+     * @function boot
+     */
+    boot: function () {
 
         if (this.isBooted) {
             return;
         }
 
-        this._forceUpdate = true;
 
         var AudioContext = window.AudioContext || window.webkitAudioContext;
         this.audioCtx = new AudioContext();
@@ -740,45 +942,61 @@ Flare.MediaPlayer.prototype = {
 
 
     },
-
-
-    //This should probably go in videoEngine
-    update: function(time) {
+    /**
+     * This is the core video logic loop
+     * @memberof Flare.MediaPlayer.prototype
+     * @param {time} time of update
+     */
+    update: function (time) {
         this.clock.update(time);
         //Finished with update, render the frame:
         //TESTING ONLY
 
         /*
-        if(this.numPressedPlay === 0){
-            this.setStartTime(Date.now());
-        }
-        */
+         if(this.numPressedPlay === 0){
+         this.setStartTime(Date.now());
+         }
+         */
 
         //this.canvas.render(this.frames[this.testCounter%152]);
         if (this.isPlaying) {
-            
-            
+
+
             this.deltaTime = Date.now() - this.timeStarted;
-            this.audioEngine.playSound(this.deltaTime);  
+            this.audioEngine.playSound(this.deltaTime);
             //this.videoPlayer.updateTimeDisplay(this.clock.totalTimePlayed(this.timeStarted, this.totalTimePaused), "0:33");
-            
+
             //this.videoPlayer.update(this.buffer.getFrameAt(this.testCounter), this.testCounter);
             this.videoPlayer.update(this.deltaTime);
             //this.testCounter = (this.testCounter + 1) % 151;
 
         }
-        
-    },
 
-    setStartTime: function(time) {
+    },
+    /**
+     * Sets the time started 
+     * @memberof Flare.MediaPlayer.prototype
+     * @function setStartTime
+     * @param {number} time time at which playback starts
+     */
+    setStartTime: function (time) {
         this.timeStarted = time;
     },
-
-    setPauseTime: function(time) {
+    /**
+     * Sets paused time
+     * @memberof Flare.MediaPlayer.prototype
+     * @function setPauseTime
+     * @param {number} time time at which playback pauses
+     */
+    setPauseTime: function (time) {
         this.timePaused = time;
     },
-    
-    togglePlay: function() {
+    /**
+     * Switches between play and pause mode
+     * @memberof Flare.MediaPlayer.prototype
+     * @function togglePlay
+     */
+    togglePlay: function () {
 
         if (this.isPlaying) {
             this.isPlaying = false;
@@ -787,79 +1005,197 @@ Flare.MediaPlayer.prototype = {
             this.audioEngine.stopSound();
         } else {
             this.isPlaying = true;
-            
-            
-            if(this.timePaused === 0){
+
+
+            if (this.timePaused === 0) {
                 this.setStartTime(Date.now());
-            }else{
-                this.setStartTime(Date.now()-this.deltaTime);
+            } else {
+                this.setStartTime(Date.now() - this.deltaTime);
             }
             //this.audioEngine.playSound(Date.now() - this.timeStarted);
             /*
-            if(this.numPressedPlay > 0){
-                this.totalTimePaused += Date.now() - this.clock.getPauseTime();
-            }
-            this.numPressedPlay++;
-            */
+             if(this.numPressedPlay > 0){
+             this.totalTimePaused += Date.now() - this.clock.getPauseTime();
+             }
+             this.numPressedPlay++;
+             */
         }
     },
-    
-    reset: function(){
+    /**
+     * Resets the timeline
+     * @memberof Flare.MediaPlayer.prototype
+     * @function reset
+     */
+    reset: function () {
         //reset all counters
         this.timePaused = 0;
         this.timeStarted = 0;
         this.deltaTime = 0;
     },
-
-    isPlayMode: function() {
+    /**
+     * Is currently in play mode
+     * @memberof Flare.MediaPlayer.prototype
+     * @function isPlayMode
+     * @return {boolean} is currently playing
+     */
+    isPlayMode: function () {
         return this.isPlaying;
     },
-
-    getNumPressedPlay: function() {
+    /**
+     * Gets number of times play was pressed
+     * @memberof Flare.MediaPlayer.prototype
+     * @function getNumPressedPlay
+     * @return {number} number of times play was pressed
+     */
+    getNumPressedPlay: function () {
         return this.numPressedPlay;
     },
-    
-    finishPlayback: function(){
+    /**
+     * callback for when the end of the timeline has been reached
+     * @memberof Flare.MediaPlayer.prototype
+     * @function finishPlayback
+     */
+    finishPlayback: function () {
         this.isPlaying = false;
         this.audioEngine.stopSound();
         this.reset();
-        
+
     }
 
 
 };
 
 Flare.MediaPlayer.prototype.constructor = Flare.MediaPlayer;
-Flare.VideoPlayer = function(mediaPlayer) {
+/**
+ * class for handling the canvas element
+ * @author Fredrik Sigvartsen and Brian Parra and Jens Omfjord
+ * @memberOf Flare
+ * @class Flare.VideoPlayer
+ * @constructor
+ * @param {Flare.MediaPlayer} mediaPlayer a reference to the mediaPlayer
+ * @return {Flare.VideoPlayer} returns a Flare VideoPlayer
+ */
+Flare.VideoPlayer = function (mediaPlayer) {
 
 
     /**
-     * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
+     * @property {Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
      */
     this.mediaPlayer = mediaPlayer;
+
+    /**
+     * @property {object} canvas reference to the canvas object
+     */
     this.canvas = null;
+
+    /**
+     * @property {number} videoWidth the video width
+     */
     this.videoWidth;
+
+    /**
+     * @property {number} videoHeight the video height
+     */
     this.videoHeight;
+
+    /**
+     * @property {object} videoPlayer the DOM video player container element
+     */
     this.videoPlayer;
+
+    /**
+     * @property {object} controlBar the wrapper for the bottom control bar
+     */
     this.controlBar;
+
+    /**
+     * @property {object} progressBarContainer the container for the progress bars
+     */
     this.progressBarContainer;
-    
+
+    /**
+     * @property {object} playButton the play button
+     */
     this.playButton;
+
+    /**
+     * @property {object} controlBarInner the inner wrapper for the control bar
+     */
     this.controlBarInner;
+
+    /**
+     * @property {object} leftControls a left floated div for the controls on the left of the bar
+     */
     this.leftControls;
+
+    /**
+     * @property {object} rightControls a left floated div for the controls on the right of the bar
+     */
     this.rightControls;
+
+    /**
+     * @property {object} settingsButton the settings button
+     */
     this.settingsButton;
+
+    /**
+     * @property {string} settingsPath the svg path for the settings button
+     */
     this.settingsPath;
+
+    /**
+     * @property {object} progressBar the bar that shows the timeline progress
+     */
     this.progressBar;
+
+    /**
+     * @property {object} progressBarDisplayGroup wrapper for the different progress bars like buffering and playback
+     */
     this.progressBarDisplayGroup;
+
+    /**
+     * @property {object} loadProgressBar shows buffer status
+     */
     this.loadProgressBar;
+
+    /**
+     * @property {object} playProgress shows play progress in %
+     */
     this.playProgress;
+
+    /**
+     * @property {object} timeDisplay shows formated time display
+     */
     this.timeDisplay;
+
+    /**
+     * @property {object} volumeControl wrapper for volume slider
+     */
     this.volumeControl;
+
+    /**
+     * @property {object} muteButton mute button
+     */
     this.muteButton;
+
+    /**
+     * @property {object} loadingBar shows spinning wheel
+     */
     this.loadingBar;
+
+    /**
+     * @property {boolean} buttonsLocked are the buttons currently locked
+     */
     this.buttonsLocked = false;
+
+    /**
+     * @property {number} durationInMin the duration in min
+     */
     this.durationInMin = 0;
+
+    /**
+     * @property {number} fps the frames per second
+     */
     this.fps;
 
     this.muteButtonStyle = {
@@ -872,7 +1208,7 @@ Flare.VideoPlayer = function(mediaPlayer) {
         display: 'inline-block'
 
     };
-    
+
     this.loadProgressBarStyle = {
         position: 'absolute',
         bottom: 0,
@@ -893,7 +1229,7 @@ Flare.VideoPlayer = function(mediaPlayer) {
     };
 
     this.playProgressStyle = {
-        'z-index' : 2,
+        'z-index': 2,
         position: 'absolute',
         bottom: 0,
         left: '0px',
@@ -951,12 +1287,11 @@ Flare.VideoPlayer = function(mediaPlayer) {
         width: '960px',
         height: '540px',
         display: 'inline-block',
-        'font-family' : 'Arial'
+        'font-family': 'Arial'
 
     };
 
     this.controlBarInnerStyle = {
-
     };
 
     this.controlBarStyle = {
@@ -1006,8 +1341,12 @@ Flare.VideoPlayer = function(mediaPlayer) {
 };
 
 Flare.VideoPlayer.prototype = {
-
-    boot: function() {
+    /**
+     * Boots up the VideoPlayer and creates the Dom Elements
+     * @memberof Flare.VideoPlayer.prototype
+     * @function boot
+     */
+    boot: function () {
 
         this.videoPlayer = document.createElement("div");
         this.loadingBar = document.createElement("div");
@@ -1027,7 +1366,7 @@ Flare.VideoPlayer.prototype = {
         this.timeDisplay = document.createElement("div");
         this.settingsButton = document.createElement("svg");
         this.settingsPath = document.createElementNS('http://www.w3.org/2000/svg', "path");
-        
+
 
 
         this.settingsPath.setAttributeNS(null, "d", Flare.Icons.settings);
@@ -1054,7 +1393,7 @@ Flare.VideoPlayer.prototype = {
         this.setStyle(this.muteButton, this.muteButtonStyle);
         this.setStyle(this.loadingBar, this.loadingBarStyle);
         this.setStyle(this.loadProgressBar, this.loadProgressBarStyle);
-        
+
 
         this.setAttributes(this.progressBar, this.progressBarAttribtues);
 
@@ -1096,7 +1435,7 @@ Flare.VideoPlayer.prototype = {
 
         var target;
         var parent = this.mediaPlayer.options.container;
-        
+
 
         if (parent) {
             if (typeof parent === 'string') {
@@ -1114,30 +1453,39 @@ Flare.VideoPlayer.prototype = {
         console.log(target);
         target.appendChild(this.videoPlayer);
     },
-
-
-
-    update: function(videoTime) {
+    /**
+     * On each update (hopefully 60fps) update the UI
+     * @memberof Flare.VideoPlayer.prototype
+     * @function update
+     * @param {number} the current time of the video
+     */
+    update: function (videoTime) {
         //calculate which frame number, get that frame from buffer
         //video time is in ms
-        var progress = (videoTime/1000) / this.mediaPlayer.buffer.getDuration();
-        
-        if(progress >= 1.0){
+        var progress = (videoTime / 1000) / this.mediaPlayer.buffer.getDuration();
+
+        if (progress >= 1.0) {
             this.mediaPlayer.finishPlayback();
             return;
         }
-        
-        var frameNumber = Math.floor((videoTime/1000) * this.fps);
+
+        var frameNumber = Math.floor((videoTime / 1000) * this.fps);
         //console.log(progress + "progress");
         //console.log (frameNumber + "frame num");
         this.canvas.render(this.mediaPlayer.buffer.getFrameAt(frameNumber));
-        
+
         this.updatePlayProgress(progress);
         this.updateTimeDisplay(videoTime);
 
     },
-
-    setStyle: function(element, attributes) {
+    /**
+     * Utility function for setting styles of an element
+     * @memberof Flare.VideoPlayer.prototype
+     * @function setStyle
+     * @param {object} element Dom element to add styles to
+     * @param {array} attributes attributes to add 
+     */
+    setStyle: function (element, attributes) {
 
         for (var attribute in attributes) {
             element.style.setProperty(attribute, attributes[attribute]);
@@ -1145,41 +1493,70 @@ Flare.VideoPlayer.prototype = {
 
 
     },
-
-    setAttributes: function(element, attributes) {
+    /**
+     * Utility function for setting attributes of an element
+     * @memberof Flare.VideoPlayer.prototype
+     * @function setAttributes
+     * @param {object} element Dom element to add attributes to
+     * @param {array} attributes attributes to add 
+     */
+    setAttributes: function (element, attributes) {
 
         for (var attribute in attributes) {
             element.setAttribute(attribute, attributes[attribute]);
         }
     },
-
-
-
-    updatePlayProgress: function(progress) {
+    /**
+     * Updates the progress in the timeline display
+     * @memberof Flare.VideoPlayer.prototype
+     * @function updatePlayProgress
+     * @param {number} progress the progress in %
+     */
+    updatePlayProgress: function (progress) {
         this.playProgress.style.setProperty("transform", "scaleX(" + progress + ")");
         this.progressBar.setAttribute("aria-valuenow", parseInt(progress * 100));
     },
-    
-    updateLoadProgress: function(progress) {
+    /**
+     * Updates the progress in the buffering display
+     * @memberof Flare.VideoPlayer.prototype
+     * @function updateLoadProgress
+     * @param {number} progress the progress in %
+     */
+    updateLoadProgress: function (progress) {
         this.loadProgressBar.style.setProperty("transform", "scaleX(" + progress + ")");
         //this.progressBar.setAttribute("aria-valuenow", parseInt(progress * 100));
     },
-
-    handleMouseDown: function(e) {
+    /**
+     * Bind callback for mouse down on timeline
+     * @memberof Flare.VideoPlayer.prototype
+     * @function handleMouseDown
+     * @param {object} e the mouse event
+     */
+    handleMouseDown: function (e) {
         console.log(e);
         var currentProgress = parseInt(this.progressBar.getAttribute('aria-valuenow'));
         this.mediaPlayer.isPlaying = false;
 
         return false;
     },
-
-    handleDragStart: function(e) {
+    /**
+     * Bind callback for mouse drag starts
+     * @memberof Flare.VideoPlayer.prototype
+     * @function handleDragStart
+     * @param {object} e the mouse event
+     */
+    handleDragStart: function (e) {
 
         console.log(e);
 
     },
-
-    handleDrag: function(e) {
+    /**
+     * Bind callback for mouse drag. Use this for dragging the timeline and repositioning playback
+     * @memberof Flare.VideoPlayer.prototype
+     * @function handleDrag
+     * @param {object} e the mouse event
+     */
+    handleDrag: function (e) {
 
         //Make new indicator to show the drag location
 
@@ -1191,15 +1568,25 @@ Flare.VideoPlayer.prototype = {
         console.log(e);
 
     },
-
-    handleDragEnd: function(e) {
+    /**
+     * Bind callback for mouse drag ends, start playing again if was previously playing
+     * @memberof Flare.VideoPlayer.prototype
+     * @function handleDragEnd
+     * @param {object} e the mouse event
+     */
+    handleDragEnd: function (e) {
 
         //if in play mode, continue playing from new location
         //buffer if neccessary
 
     },
-
-    handlePlayButtonPress: function(e) {
+    /**
+     * Bind callback for play button. Toggle playback here
+     * @memberof Flare.VideoPlayer.prototype
+     * @function handlePlayButtonPress
+     * @param {object} e the mouse event
+     */
+    handlePlayButtonPress: function (e) {
         console.log("play clicked");
         this.mediaPlayer.togglePlay();
 
@@ -1210,35 +1597,67 @@ Flare.VideoPlayer.prototype = {
         }
 
     },
-
-    updateTimeDisplay: function(videoTime) {
-        this.timeDisplay.innerHTML = this.formatTimeFromMiliSeconds(videoTime)+ " / " + this.durationInMin;    
+    /**
+     * Updates the numerical time display in formated min/sec
+     * @memberof Flare.VideoPlayer.prototype
+     * @function handlePlayButtonPress
+     * @param {number} videoTime the time in the video
+     */
+    updateTimeDisplay: function (videoTime) {
+        this.timeDisplay.innerHTML = this.formatTimeFromMiliSeconds(videoTime) + " / " + this.durationInMin;
     },
-    
-    formatTimeFromSeconds:function (timeInSeconds){
+    /**
+     * Utility function to format time in seconds into a string
+     * @memberof Flare.VideoPlayer.prototype
+     * @function formatTimeFromSeconds
+     * @param {number} timeInSeconds video time in seconds
+     * @return {string} formated time
+     */
+    formatTimeFromSeconds: function (timeInSeconds) {
         var totalSeconds = Math.floor(timeInSeconds);
-        var min =  Math.floor(totalSeconds/60);
-        var seconds = totalSeconds%60;
+        var min = Math.floor(totalSeconds / 60);
+        var seconds = totalSeconds % 60;
         var formattedTime = this.formatDigits(min) + ":" + this.formatDigits(seconds);
-        
+
         return formattedTime;
     },
-    
-    formatTimeFromMiliSeconds:function (timeInMs){
-        return this.formatTimeFromSeconds(timeInMs/1000);
+    /**
+     * Utility function to format time in ms into a string
+     * @memberof Flare.VideoPlayer.prototype
+     * @function formatTimeFromMiliSeconds
+     * @param {number} timeInMS video time in ms
+     * @return {string} formated time
+     */
+    formatTimeFromMiliSeconds: function (timeInMs) {
+        return this.formatTimeFromSeconds(timeInMs / 1000);
     },
-    
-    formatDigits: function(time){
+    /**
+     * Utility function to format the leading 0
+     * @memberof Flare.VideoPlayer.prototype
+     * @function formatDigits
+     * @param {number} time to format
+     * @return {string} formated time with leading 0 if single digit
+     */
+    formatDigits: function (time) {
         if (time > 9)
             return time
-        else return "0" + time;
+        else
+            return "0" + time;
     },
-
-    removeLoadingBar: function(){
+    /**
+     * Removes loading animation once loaded
+     * @memberof Flare.VideoPlayer.prototype
+     * @function removeLoadingBar
+     */
+    removeLoadingBar: function () {
         this.videoPlayer.removeChild(this.loadingBar);
     },
-
-    toggleLockingButtons: function() {
+    /**
+     * Locks and unlocks the ui buttons
+     * @memberof Flare.VideoPlayer.prototype
+     * @function toggleLockingButtons
+     */
+    toggleLockingButtons: function () {
         if (this.buttonsLocked) {
             this.playButton.removeAttribute("disabled");
             this.muteButton.removeAttribute("disabled");
@@ -1256,71 +1675,89 @@ Flare.VideoPlayer.prototype = {
             this.buttonsLocked = true;
         }
     },
-    
-    setDuration: function(duration){
+    /**
+     * Sets the duration of the video 
+     * @memberof Flare.VideoPlayer.prototype
+     * @function setDuration
+     * @param {number} duration duration in seconds
+     */
+    setDuration: function (duration) {
         console.log(this.formatTimeFromSeconds(duration) + "loading");
         this.durationInMin = this.formatTimeFromSeconds(duration);
         this.updateTimeDisplay(0);
-        
+
     },
-    
-    setFps: function(fps){
+    /**
+     * Sets the fps
+     * @param {number} fps frames per second
+     */
+    setFps: function (fps) {
         this.fps = fps;
     },
-    
-
-    
-
-
-
-
 };
 
 Flare.VideoPlayer.prototype.constructor = Flare.VideoPlayer;
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * "Abstract" class for FlareMessage
+ * @author Brian Parra
+ * @memberOf Flare
+ * @class Flare.FlareMessage
+ * @constructor
+ * @return {Flare.FlareMessage} returns a FlareMessage
  */
-
-
-Flare.FlareMessage = function(){
+Flare.FlareMessage = function () {
     this.flareOpCode; //1 byte
-    
+
     this.totalMessageLength; //int
     this.dataLength; // int
-    
+
     this.headerLength = 5;
- 
+
     return this;
 };
 
 Flare.FlareMessage.prototype = {
-    
-    addStringToBinary : function(dataView , offset, string){
-        
-        dataView.setUint8(offset , (string.length &amp; 0xff));//Add The length of string
-   
-        for(var index = 0; index &lt; string.length; index ++){
-            dataView.setUint8(index + 1 + offset , string.charCodeAt(index));
+    /**
+     * A function that adds a string to a binary dataView at a designated offset
+     * @memberof Flare.FlareMessage.prototype
+     * @function addStringToBinary
+     * @param {object} dataView the binary dataView object
+     * @param {number} offset the integer offset in the dataview
+     * @param {string} string the string to add
+     * 
+     */
+    addStringToBinary: function (dataView, offset, string) {
+
+        dataView.setUint8(offset, (string.length &amp; 0xff));//Add The length of string
+
+        for (var index = 0; index &lt; string.length; index++) {
+            dataView.setUint8(index + 1 + offset, string.charCodeAt(index));
         }
-        
-        
-        
-        
+
+
+
+
     }
-  
-    
+
+
 };
 
 Flare.Buffer.prototype.constructor = Flare.FlareMessage;
 
 
 
-    
 
 
 
+/**
+ * Message for requesting a video
+ * @author Brian Parra
+ * @memberOf Flare
+ * @class Flare.OpenVideoMessage
+ * @augments Flare.FlareMessage
+ * @constructor
+ * @return {Flare.OpenVideoMessage} returns an OpenVideoMessage
+ */
 Flare.OpenVideoMessage = function () {
 
     Flare.FlareMessage.call(this);//Inherit from flaremessage
@@ -1339,13 +1776,24 @@ Flare.OpenVideoMessage.prototype = Object.create(Flare.FlareMessage.prototype);
 Flare.OpenVideoMessage.prototype.constructor = Flare.OpenVideoMessage;
 
 
-
+/**
+ * Sets the requestID of desired video
+ * @memberof Flare.OpenVideoMessage.prototype
+ * @function setRequestFile
+ * @param {string} requestFile the string of the request ID
+ */
 Flare.OpenVideoMessage.prototype.setRequestFile = function (requestFile) {
 
     this.requestFile = requestFile;
 
 };
 
+/**
+ * Turns the entire message into a binary array for sending
+ * @memberof Flare.OpenVideoMessage.prototype
+ * @function toBinary
+ * @return {object} data view of binary
+ */
 Flare.OpenVideoMessage.prototype.toBinary = function () {
 
     this.dataLength = this.requestFile.length + 1;
@@ -1362,14 +1810,6 @@ Flare.OpenVideoMessage.prototype.toBinary = function () {
     dataView.setInt32(1, (this.totalMessageLength &amp; 0xffffffff));//Set The Op Code
 
     this.addStringToBinary(dataView, this.headerLength, this.requestFile); // add the request string
-    
-    /*
-    //For testing what the byte array looks like
-    for(var test = 0; test &lt; this.totalMessageLength; test++){
-        console.log("byte Number :" + test + "  : "+ dataView.getUint8(test));
-    }
-    */
-
 
     return data;
 
@@ -1384,6 +1824,14 @@ Flare.OpenVideoMessage.prototype.toBinary = function () {
 
 
 
+/**
+ * Flare OpCodes
+ * @author Brian Parra
+ * @memberOf Flare
+ * @type {object}
+ * @constant
+ */
+
 Flare.OpCode = {
     //Put Constant values here
 
@@ -1395,36 +1843,70 @@ Flare.OpCode = {
 
 };
 
+/**
+ * Hash map of FlareTasks for corresponding Flare OpCodes
+ * @author Brian Parra
+ * @memberOf Flare
+ * @type {object}
+ * @constant
+ */
 Flare.TaskTable = {};
 Flare.TaskTable[Flare.OpCode.OPEN_VIDEO] = Flare.InitializeVideoTask;
 Flare.TaskTable[Flare.OpCode.FRAME] = Flare.ProcessFrameTask;
 Flare.TaskTable[Flare.OpCode.AUDIO] = Flare.ProcessAudioTask;
-
+/**
+ * Image data should be stored here as svg data
+ * @author Brian Parra
+ * @memberOf Flare
+ * @type {object}
+ * @constant
+ */
 Flare.Icons = {
-  settings : 
-      "M863.24,382.771l-88.759-14.807c-6.451-26.374-15.857-51.585-28.107-75.099l56.821-70.452   c12.085-14.889,11.536-36.312-1.205-50.682l-35.301-39.729c-12.796-14.355-34.016-17.391-50.202-7.165l-75.906,47.716   c-33.386-23.326-71.204-40.551-112-50.546l-14.85-89.235c-3.116-18.895-19.467-32.759-38.661-32.759h-53.198   c-19.155,0-35.561,13.864-38.608,32.759l-14.931,89.263c-33.729,8.258-65.353,21.588-94.213,39.144l-72.188-51.518   c-15.558-11.115-36.927-9.377-50.504,4.171l-37.583,37.61c-13.548,13.577-15.286,34.946-4.142,50.504l51.638,72.326   c-17.391,28.642-30.584,60.086-38.841,93.515l-89.743,14.985C13.891,385.888,0,402.24,0,421.435v53.156   c0,19.193,13.891,35.547,32.757,38.663l89.743,14.985c6.781,27.508,16.625,53.784,29.709,78.147L95.647,676.44   c-12.044,14.875-11.538,36.312,1.203,50.669l35.274,39.73c12.797,14.382,34.028,17.363,50.216,7.163l77-48.37   c32.581,22.285,69.44,38.664,108.993,48.37l14.931,89.25c3.048,18.896,19.453,32.76,38.608,32.76h53.198   c19.194,0,35.545-13.863,38.661-32.759l14.875-89.25c33.308-8.147,64.531-21.245,93.134-38.5l75.196,53.705   c15.53,11.155,36.915,9.405,50.478-4.186l37.598-37.597c13.532-13.536,15.365-34.893,4.127-50.479l-53.536-75.059   c17.441-28.738,30.704-60.238,38.909-93.816l88.758-14.82c18.921-3.116,32.756-19.469,32.756-38.663v-53.156   C895.998,402.24,882.163,385.888,863.24,382.771z M449.42,616.013c-92.764,0-168-75.25-168-168c0-92.764,75.236-168,168-168   c92.748,0,167.998,75.236,167.998,168C617.418,540.763,542.168,616.013,449.42,616.013z"
 
-   
-    
-};
+/**
+ * @memberOf Flare.Icons
+ * @type {string}
+ */
+settings :
+        "M863.24,382.771l-88.759-14.807c-6.451-26.374-15.857-51.585-28.107-75.099l56.821-70.452   c12.085-14.889,11.536-36.312-1.205-50.682l-35.301-39.729c-12.796-14.355-34.016-17.391-50.202-7.165l-75.906,47.716   c-33.386-23.326-71.204-40.551-112-50.546l-14.85-89.235c-3.116-18.895-19.467-32.759-38.661-32.759h-53.198   c-19.155,0-35.561,13.864-38.608,32.759l-14.931,89.263c-33.729,8.258-65.353,21.588-94.213,39.144l-72.188-51.518   c-15.558-11.115-36.927-9.377-50.504,4.171l-37.583,37.61c-13.548,13.577-15.286,34.946-4.142,50.504l51.638,72.326   c-17.391,28.642-30.584,60.086-38.841,93.515l-89.743,14.985C13.891,385.888,0,402.24,0,421.435v53.156   c0,19.193,13.891,35.547,32.757,38.663l89.743,14.985c6.781,27.508,16.625,53.784,29.709,78.147L95.647,676.44   c-12.044,14.875-11.538,36.312,1.203,50.669l35.274,39.73c12.797,14.382,34.028,17.363,50.216,7.163l77-48.37   c32.581,22.285,69.44,38.664,108.993,48.37l14.931,89.25c3.048,18.896,19.453,32.76,38.608,32.76h53.198   c19.194,0,35.545-13.863,38.661-32.759l14.875-89.25c33.308-8.147,64.531-21.245,93.134-38.5l75.196,53.705   c15.53,11.155,36.915,9.405,50.478-4.186l37.598-37.597c13.532-13.536,15.365-34.893,4.127-50.479l-53.536-75.059   c17.441-28.738,30.704-60.238,38.909-93.816l88.758-14.82c18.921-3.116,32.756-19.469,32.756-38.663v-53.156   C895.998,402.24,882.163,385.888,863.24,382.771z M449.42,616.013c-92.764,0-168-75.25-168-168c0-92.764,75.236-168,168-168   c92.748,0,167.998,75.236,167.998,168C617.418,540.763,542.168,616.013,449.42,616.013z"
 
 
+
+        };
+
+/**
+ * class for handling audio engine
+ * @author Brian Parra
+ * @memberOf Flare
+ * @class Flare.NetworkManager
+ * @constructor
+ * @param {Flare.MediaPlayer} mediaPlayer a reference to the mediaPlayer
+ * @return {Flare.NetworkManager} returns a Flare AudioEngine
+ */
 Flare.NetworkManager = function (mediaPlayer) {
 
 
     /**
-     * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
+     * @property {Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
      */
     this.mediaPlayer = mediaPlayer;
+
+    /**
+     * @property {object} socket the websocket connection
+     */
     this.socket;
 
+    /**
+     * @property {boolean} is the connection opened
+     */
     this.connected = false;
 
-    this.callbacks = {};
+
+
 
     this.connect();
     this.setup();
-    
+
 
 
     return this;
@@ -1434,18 +1916,30 @@ Flare.NetworkManager = function (mediaPlayer) {
 };
 
 Flare.NetworkManager.prototype = {
-    
+    /**
+     * This function connects the websocket
+     * @memberof Flare.NetworkManager.prototype
+     * @function connect
+     */
     connect: function () {
         var connectionUrl = 'ws://' + this.mediaPlayer.options.uri + ':' + this.mediaPlayer.options.port;
         this.socket = new WebSocket(connectionUrl);
         this.socket.binaryType = 'arraybuffer';
     },
-    
+    /**
+     * Closes the connection
+     * @memberof Flare.NetworkManager.prototype
+     * @function close
+     */
     close: function () {
 
         this.socket.close();
     },
-    
+    /**
+     * Binds all handlers to websocket
+     * @memberof Flare.NetworkManager.prototype
+     * @function setup
+     */
     setup: function () {
 
         this.socket.onopen = this.onOpen.bind(this);
@@ -1454,28 +1948,40 @@ Flare.NetworkManager.prototype = {
         this.socket.onerror = this.onError.bind(this);
 
     },
-    
+    /**
+     * Onopen event handler
+     * @memberof Flare.NetworkManager.prototype
+     * @function onOpen
+     */
     onOpen: function () {
-        
+
         this.connected = true;
         console.log("connection Opened");
         //this.socket.send("hello");
         //this.requestVideo(this.mediaPlayer.options.videoPath);
         this.requestVideo();
-        
+
 
     },
-    
+    /**
+     * Close event handler
+     * @memberof Flare.NetworkManager.prototype
+     * @function onCloser
+     */
     onClose: function (message) {
         console.log("closed");
         console.log(message);
     },
-    
+    /**
+     * OnMessage event handler, process incoming data here
+     * @memberof Flare.NetworkManager.prototype
+     * @function onMessage
+     */
     onMessage: function (message) {
-        
-        if (message.data instanceof ArrayBuffer ){
-            
-            
+
+        if (message.data instanceof ArrayBuffer) {
+
+
             //All incoming binary should be images
             //console.log(message);
             var dataView = new DataView(message.data);
@@ -1483,96 +1989,65 @@ Flare.NetworkManager.prototype = {
             var dataLength = dataView.getUint32(0);
             //console.log("lenth " + dataLength);
             //console.log("opCode " + opCode);
-            
-            
+
+
             var task = new Flare.TaskTable[opCode];
             task.setData(message.data);
             task.setMediaPlayer(this.mediaPlayer);
             task.process();
-            
-            
-            
-            /*
-            var dataLength = dataView.getInt32(1);
-            var videoIsAvailable = dataView.getInt8(5);
-            console.log("opCode is " + opCode);
-            console.log("data Length is " + dataLength);
-            console.log("video is Available is " + videoIsAvailable);
-            */
-            
-            /*
-            var blob = new Blob([dataView], { type: 'image/bmp' });
-            var reader = new FileReader();
-            reader.readAsDataURL(blob);
-            reader.onloadend = function () {
-                var img = document.createElement('img');
-                img.src =  reader.result;
-                document.body.appendChild(img);
-                
-            }.bind(this);
-            */
-            
-            
-        }else if (typeof message.data === "string"){
-            
+
+
+        } else if (typeof message.data === "string") {
+
             //Process as json
 
             var data = JSON.parse(message.data);
             console.log(data.test);
-            
-            
+
+
         }
         //var data = message.data;
-        
+
     },
-    
+    /**
+     * Handler websocket errors here
+     * @memberof Flare.NetworkManager.prototype
+     * @function onError
+     */
     onError: function (e) {
         console.log(e);
     },
-    
+    /**
+     * Sends data
+     * @memberof Flare.NetworkManager.prototype
+     * @function send
+     * @param {object} data binary data to send
+     */
     send: function (data) {
 
         this.socket.send(data);
 
     },
-    
-    getEndianness: function () {
-        var a = new ArrayBuffer(4);
-        var b = new Uint8Array(a);
-        var c = new Uint32Array(a);
-        b[0] = 0xa1;
-        b[1] = 0xb2;
-        b[2] = 0xc3;
-        b[3] = 0xd4;
-        if (c[0] === 0xd4c3b2a1) {
-            return BlobReader.ENDIANNESS.LITTLE_ENDIAN;
-        }
-        if (c[0] === 0xa1b2c3d4) {
-            return BlobReader.ENDIANNESS.BIG_ENDIAN;
-        } else {
-            throw new Error('Unrecognized endianness');
-        }
-    },
-    
-    requestVideo: function(){
-        
+    /**
+     * Once the connection is opened, this function requests a video
+     * @memberof Flare.NetworkManager.prototype
+     * @function requestVideo
+     */
+    requestVideo: function () {
+
         var videoRequest = new Flare.OpenVideoMessage();
         videoRequest.setRequestFile(this.mediaPlayer.options.videoID);
-        
-        
+
+
         //console.log(videoRequest.toBinary());
         this.socket.send(videoRequest.toBinary());
-        
-        
-        
+
+
     }
 
 };
 
 Flare.NetworkManager.prototype.constructor = Flare.NetworkManager;
-
-Flare.NETWORK_PROTOCOL_TABLE = {};
-
 
     if (typeof exports !== 'undefined') {
         if (typeof module !== 'undefined' &amp;&amp; module.exports) {
@@ -1588,54 +2063,101 @@ Flare.NETWORK_PROTOCOL_TABLE = {};
     return Flare;
     
 }).call(this);
-
 /**
- * Class to handle the internal clock time and do adjustments depending on how fast the browser handles the updates
- * @param {type} mediaPlayer
- * @returns {Flare.Clock}
+ * Class for keeping track of time
+ * @author Brian Parra
+ * @memberOf Flare
+ * @class Flare.Clock
+ * @constructor
+ * @param {Flare.MediaPlayer} mediaPlayer a reference to the mediaPlayer
+ * @return {Flare.Clock} returns a Flare AudioEngine
  */
+
 Flare.Clock = function (mediaPlayer) {
 
 
     /**
-     * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
+     * @property {Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
      */
     this.mediaPlayer = mediaPlayer;
-    
+
+    /**
+     * @property {number} _timeInitialized the time the clock has started
+     */
     this._timeInitialized = 0;
-    
+
+    /*
+     * @property {number} elapsed time elapsed
+     */
     this.elapsed = 0;
-    
+
+    /*
+     * @property {number} elapsedMs time elapsed in ms
+     */
     this.elapsedMs = 0;
-    
+
+    /*
+     * @property {number} previousTime previous clock update time
+     */
     this.previousTime = 0;
 
+    /*
+     * @property {number} currentTime the current time
+     */
     this.currentTime = 0;
-    
+
+    /*
+     * @property {number} timeUpdated the time updated
+     */
     this.timeUpdated = 0;
-    
+
+    /*
+     * @property {number} lastTimeUpdated last time updated
+     */
     this.lastTimeUpdated = 0;
 
+    /*
+     * @property {number} timeStarted time when the clock was started
+     */
     this.timeStarted = 0;
 
+    /*
+     * @property {number} timePaused time when paused
+     */
     this.timePaused = 0;
 
+    /*
+     * @property {number} time getneric time holder
+     */
     this.time = 0;
 
+    /*
+     * @property {number} minutes minutes played
+     */
     this.minutes = 0;
-    
+
     return this;
 
 
 };
 
 Flare.Clock.prototype = {
-    boot: function(){
+    /**
+     * Boot function for the clock
+     * @memberof Flare.Clock.prototype
+     * @function boot
+     * 
+     */
+    boot: function () {
         this._timeInitialized = Date.now();
         this.timeUpdated = Date.now();
     },
-    
-    
+    /**
+     * On each refresh, adjust all the time holders
+     * @memberof Flare.Clock.prototype
+     * @function refresh
+     * 
+     */
     refresh: function () {
 
         //  Set to the old Date.now value
@@ -1648,10 +2170,16 @@ Flare.Clock.prototype = {
         this.elapsedMs = this.timeUpdated - this.lastTimeUpdated;
 
     },
-    
-    update: function(time) {
-       
-       
+    /**
+     * The function thats called on update
+     * @memberof Flare.Clock.prototype
+     * @function update
+     * @param {number} time  time updated
+     * 
+     */
+    update: function (time) {
+
+
         this.lastTimeUpdated = this.timeUpdated;
 
         // this.time always holds a Date.now value
@@ -1660,164 +2188,279 @@ Flare.Clock.prototype = {
         this.elapsedMS = this.timeUpdated - this.lastTimeUpdated;
 
         this.previousTime = this.currentTime;
-        
+
         this.currentTime = time;
 
         this.elapsed = this.currentTime - this.previousTime;
-        
-    },
 
-    totalTimePlayed: function(startTime, pauseTime) {
-        if(startTime === 0){    //video has not started playing yet
+    },
+    /**
+     * Get the total time played
+     * @memberof Flare.Clock.prototype
+     * @function totalTimePlayed
+     * @param {number} startTime time Started
+     * @param {number} pauseTime time paused
+     * @return {string} formated time string
+     */
+    totalTimePlayed: function (startTime, pauseTime) {
+        if (startTime === 0) {    //video has not started playing yet
             return 0;
         }
         this.time = ((Date.now() - startTime) - pauseTime) / 1000;
         var seconds = Math.floor(this.time * 1) / 1;
-        if(seconds > 59){
+        if (seconds > 59) {
             this.minutes++;
             this.time = 0;
             seconds = 0;
-            this.mediaPlayer.setStartTime(Date.now()); 
+            this.mediaPlayer.setStartTime(Date.now());
         }
-        if(seconds &lt; 10){
+        if (seconds &lt; 10) {
             return this.minutes + ":0" + seconds;
         }
         return this.minutes + ":" + seconds;
     },
-
-    getPauseTime: function() {
+    /**
+     * Get the last tiem paused
+     * @memberof Flare.Clock.prototype
+     * @function getPauseTime
+     * @return {number} time paused
+     * 
+     */
+    getPauseTime: function () {
         return this.timePaused;
     },
-
-    setPauseTime: function(time) {
+    /**
+     * Set time paused
+     * @memberof Flare.Clock.prototype
+     * @function setPauseTime
+     * @param {number} time paused
+     * 
+     */
+    setPauseTime: function (time) {
         this.timePaused = time;
     }
-  
+
 };
 
 Flare.Clock.prototype.constructor = Flare.Clock;
+/**
+ * class for handling audio engine
+ * @author Brian
+ * @memberOf Flare
+ * @class Flare.Oscillator
+ * @constructor
+ * @param {Flare.MediaPlayer} mediaPlayer a reference to the mediaPlayer
+ * @return {Flare.Oscillator} returns an Oscillator
+ */
 
-
-//This thing handles making the browser do loops
 Flare.Oscillator = function (mediaPlayer) {
 
 
     /**
-     * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
+     * @property {Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
      */
     this.mediaPlayer = mediaPlayer;
 
+    /**
+     * @property {boolean} running is the oscillator running
+     */
     this.running = false;
 
+    /**
+     * @property {function} _loopFunction this is the function that is continuously called
+     */
     this._loopFunction = null;
-    
+
+    /**
+     * @property {number} _eventId the id of the timeout event
+     */
     this._eventId = null;
-    
+
+    /**
+     * @property {number} fps the frames per second
+     */
     this.fps = 30; // Testing for now
-    
+
+    /**
+     * @property {number} speed at which the updates are occuring
+     */
     this.updateSpeed = 0;
-    
+
+    /**
+     * @property {boolean} usingSetTimeOut is SetTimeOut being used for loop
+     */
     this.usingSetTimeOut = false;
+
+    /**
+     * @property {boolean} usingRequestAnimationFrame is RequestAnimationFrame being used for loop
+     */
     this.usingRequestAnimationFrame = false;
-    
+
     return this;
 
 
 };
 
 Flare.Oscillator.prototype = {
-    
-    run: function(){
-        
+    /**
+     * This is the main function to start the loops
+     * @memberof Flare.Oscillator.prototype
+     * @function run
+     */
+    run: function () {
+
         this.running = true;
         var _this = this;
-        this.updateSpeed = Math.floor(1000/this.fps);
-        
+        this.updateSpeed = Math.floor(1000 / this.fps);
+
         //if window.requestAnimationFrame is not available, use setTimeout
-        if (!window.requestAnimationFrame){
-            
+        if (!window.requestAnimationFrame) {
+
             this.usingSetTimeOut = true;
 
             this._loopFunction = function () {
                 return _this.updateSetTimeout();
             };
-            
+
             this._eventId = window.setTimeout(this._loopFunction, 0);
 
-           
-            
-        }else{
-            
+
+
+        } else {
+
             this.usingRequestAnimationFrame = true;
 
             this._loopFunction = function (time) {
                 return _this.updateRequestAnimationFrame(time);
             };
-            
-            this._eventId =  window.requestAnimationFrame(this._loopFunction);
 
- 
+            this._eventId = window.requestAnimationFrame(this._loopFunction);
+
+
         }
-        
+
     },
-    
-    stop: function(){
-        
-        if(this.usingSetTimeOut){
-            
+    /**
+     * Stop running the update loop
+     * @memberof Flare.Oscillator.prototype
+     * @function stop
+     */
+    stop: function () {
+
+        if (this.usingSetTimeOut) {
+
             clearTimeout(this._eventId);
-            
-        }else{
-            
+
+        } else {
+
             window.cancelAnimationFrame(this._eventId);
         }
-        
+
         this.running = false;
-        
+
     },
-    
-    updateRequestAnimationFrame: function(time){
-        
+    /**
+     * This is the loop function using RequestAnimationFrame
+     * @memberof Flare.Oscillator.prototype
+     * @param {number} time update time
+     * @function updateRequestAnimationFrame
+     */
+    updateRequestAnimationFrame: function (time) {
+
         this.mediaPlayer.update(Math.floor(time));
 
         this._eventId = window.requestAnimationFrame(this._loopFunction);
-        
+
     },
-    
-    updateSetTimeout: function(){
-        
+    /**
+     * This is the loop function using updateSetTimeout
+     * @memberof Flare.Oscillator.prototype
+     * @function updateRequestAnimationFrame
+     */
+    updateSetTimeout: function () {
+
         this.mediaPlayer.update(Date.now());
-        
+
         this._eventId = window.setTimeout(this._loopFunction, this.updateSpeed);
-        
+
     }
-    
+
 };
 
 Flare.Oscillator.prototype.constructor = Flare.Oscillator;
-Flare.Device = function() {
-/******************************
-* Author: Fredrik
-* last edited: May 8th, 2016
-*******************************/
+/**
+ * class for handling device specific apis
+ * @author Fredrik
+ * @memberOf Flare
+ * @class Flare.AudioEngine
+ * @constructor
+ */
 
-   this.deviceReadyAt = 0;
+Flare.Device = function () {
 
+    /*
+     * @property {number} deviceReadyAt time device was initialized at
+     */
+    this.deviceReadyAt = 0;
+
+    /*
+     * @property {boolean} initialized if the device has initialized
+     */
     this.initialized = false;
+
+    /**
+     * @property {boolean} isCompatible is the current device compatible
+     */
     this.isCompatible = false;
-    //  Features
+
+    /**
+     * @property {boolean} hasGeneralInputTypes does this device have inputs
+     */
     this.hasGeneralInputTypes = false;
+
+    /**
+     * @property {boolean} hasCanvas is the canvas available
+     */
     this.hasCanvas = false;
+
+    /**
+     * @property {boolean} hasWebGL does the device have WebGl
+     */
     this.hasWebGL = false;
+
+    /**
+     * @property {boolean} does the device have File reading/writing capabilities
+     */
     this.hasFile = false;
+
+    /**
+     * @property {boolean} hasLocalStorage can store local data
+     */
     this.hasLocalStorage = false;
+
+    /**
+     * @property {boolean} hasTypedArray is typed array available
+     */
     this.hasTypedArray = false;
-    //  Input
+
+    /**
+     * @property {boolean} hasTouch is touch input available
+     */
     this.hasTouch = false;
-    //  Audio
+
+    /**
+     * @property {boolean} hasWebAudio is webAudio available
+     */
     this.hasWebAudio = false;
-    // Device features
+
+    /**
+     * @property {boolean} fullscreen  is fullscreen available
+     */
     this.fullscreen = false;
+
+    /**
+     * @property {boolean} webSocket is websocket available
+     */
     this.webSocket = false;
 };
 
@@ -1826,11 +2469,19 @@ Flare.Device = function() {
 Flare.Device = new Flare.Device();
 
 
-Flare.Device._initialize = function() {
+/**
+ * All device initialization goes here, including feature checking
+ * @memberof Flare.Device
+ * @function _initialize
+ */
+Flare.Device._initialize = function () {
+
 
     function supportsCanvas() {
+
         var c = document.createElement('canvas');
         return !!c.getContext;
+
     }
 
     function supportsWebAudio() {
@@ -1930,10 +2581,17 @@ Flare.Device._initialize = function() {
     var range = supportsInput("range");
     this.hasGeneralInputTypes = range; // Can do hasFile too
     this.isCompatible = this.hasCanvas &amp;&amp; this.hasGeneralInputTypes
-        &amp;&amp; this.webSocket &amp;&amp; this.hasWebAudio;
+            &amp;&amp; this.webSocket &amp;&amp; this.hasWebAudio;
 };
 
-Flare.Device.whenReady = function(callback, context) {
+/**
+ * sets up Callback after device is detected to be ready, triggers the rest of the initialization
+ * @memberof Flare.Device
+ * @function whenReady
+ * @param {function} callback function to callback after ready
+ * @param {object} context context of the callback
+ */
+Flare.Device.whenReady = function (callback, context) {
 
     var readyCheck = this._readyCheck;
 
@@ -1965,7 +2623,12 @@ Flare.Device.whenReady = function(callback, context) {
     }
 };
 
-Flare.Device._readyCheck = function() {
+/**
+ * Keeps checkign to see if DOM is fully loaded and ready 
+ * @memberof Flare.Device
+ * @function _readyCheck
+ */
+Flare.Device._readyCheck = function () {
 
     var readyCheck = this._readyCheck;
 
@@ -2007,13 +2670,13 @@ Flare.Device._readyCheck = function() {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Flare.AudioEngine.html">AudioEngine</a></li></ul><h3>Namespaces</h3><ul><li><a href="Flare.html">Flare</a></li></ul><h3>Global</h3><ul><li><a href="global.html#PLAYERS">PLAYERS</a></li><li><a href="global.html#VERSION">VERSION</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Flare.AudioEngine.html">AudioEngine</a></li><li><a href="Flare.Buffer.html">Buffer</a></li><li><a href="Flare.Canvas.html">Canvas</a></li><li><a href="Flare.Clock.html">Clock</a></li><li><a href="Flare.Device.html">Device</a></li><li><a href="Flare.FlareMessage.html">FlareMessage</a></li><li><a href="Flare.InitializeVideoTask.html">InitializeVideoTask</a></li><li><a href="Flare.MediaPlayer.html">MediaPlayer</a></li><li><a href="Flare.NetworkManager.html">NetworkManager</a></li><li><a href="Flare.OpenVideoMessage.html">OpenVideoMessage</a></li><li><a href="Flare.Oscillator.html">Oscillator</a></li><li><a href="Flare.ProcessAudioTask.html">ProcessAudioTask</a></li><li><a href="Flare.ProcessFrameTask.html">ProcessFrameTask</a></li><li><a href="Flare.VideoPlayer.html">VideoPlayer</a></li></ul><h3>Namespaces</h3><ul><li><a href="Flare.html">Flare</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed May 18 2016 22:52:11 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Thu May 19 2016 03:20:08 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>

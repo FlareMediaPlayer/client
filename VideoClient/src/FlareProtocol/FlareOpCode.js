@@ -1,3 +1,11 @@
+/**
+ * Flare OpCodes
+ * @author Brian Parra
+ * @memberOf Flare
+ * @type {object}
+ * @constant
+ */
+
 Flare.OpCode = {
     //Put Constant values here
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: AudioEngine</title>
+    <title>JSDoc: Class: Clock</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: AudioEngine</h1>
+    <h1 class="page-title">Class: Clock</h1>
 
     
 
@@ -29,9 +29,9 @@
 <header>
     
         <h2>
-            <span class="ancestors"><a href="Flare.html">Flare</a>.</span>AudioEngine</h2>
+            <span class="ancestors"><a href="Flare.html">Flare</a>.</span>Clock</h2>
         
-            <div class="class-description">Flare.AudioEngine</div>
+            <div class="class-description">Flare.Clock</div>
         
     
 </header>
@@ -45,14 +45,14 @@
     <h2>Constructor</h2>
     
 
-    <h4 class="name" id="AudioEngine"><span class="type-signature"></span>new AudioEngine<span class="signature">(mediaPlayer)</span><span class="type-signature"> &rarr; {<a href="Flare.AudioEngine.html">Flare.AudioEngine</a>}</span></h4>
+    <h4 class="name" id="Clock"><span class="type-signature"></span>new Clock<span class="signature">(mediaPlayer)</span><span class="type-signature"> &rarr; {<a href="Flare.Clock.html">Flare.Clock</a>}</span></h4>
 
     
 
 
 
 <div class="description">
-    class for handling audio engine
+    Class for keeping track of time
 </div>
 
 
@@ -138,7 +138,7 @@
     <dt class="tag-author">Author:</dt>
     <dd class="tag-author">
         <ul>
-            <li>Fredrik Sigvartsen</li>
+            <li>Brian Parra</li>
         </ul>
     </dd>
     
@@ -152,7 +152,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="FlareMediaPlayer.0.0.0.js.html">FlareMediaPlayer.0.0.0.js</a>, <a href="FlareMediaPlayer.0.0.0.js.html#line363">line 363</a>
+        <a href="FlareMediaPlayer.0.0.0.js.html">FlareMediaPlayer.0.0.0.js</a>, <a href="FlareMediaPlayer.0.0.0.js.html#line2048">line 2048</a>
     </li></ul></dd>
     
 
@@ -190,7 +190,7 @@
     </dt>
     <dd>
         
-<span class="param-type"><a href="Flare.AudioEngine.html">Flare.AudioEngine</a></span>
+<span class="param-type"><a href="Flare.Clock.html">Flare.Clock</a></span>
 
 
     </dd>
@@ -218,7 +218,7 @@
 
         
             
-<h4 class="name" id="gainNode"><span class="type-signature"></span>gainNode<span class="type-signature"></span></h4>
+<h4 class="name" id="_timeInitialized"><span class="type-signature"></span>_timeInitialized<span class="type-signature"></span></h4>
 
 
 
@@ -255,13 +255,13 @@
 
         <tr>
             
-                <td class="name"><code>webAudio</code></td>
+                <td class="name"><code>_timeInitialized</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">node</span>
+<span class="param-type">number</span>
 
 
             
@@ -271,7 +271,7 @@
 
             
 
-            <td class="description last">node for gain</td>
+            <td class="description last">the time the clock has started</td>
         </tr>
 
     
@@ -310,7 +310,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="FlareMediaPlayer.0.0.0.js.html">FlareMediaPlayer.0.0.0.js</a>, <a href="FlareMediaPlayer.0.0.0.js.html#line389">line 389</a>
+        <a href="FlareMediaPlayer.0.0.0.js.html">FlareMediaPlayer.0.0.0.js</a>, <a href="FlareMediaPlayer.0.0.0.js.html#line2059">line 2059</a>
     </li></ul></dd>
     
 
@@ -420,337 +420,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="FlareMediaPlayer.0.0.0.js.html">FlareMediaPlayer.0.0.0.js</a>, <a href="FlareMediaPlayer.0.0.0.js.html#line368">line 368</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="mute"><span class="type-signature"></span>mute<span class="type-signature"></span></h4>
-
-
-
-
-
-
-
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>mute</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">tells if audio playback is muted</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="FlareMediaPlayer.0.0.0.js.html">FlareMediaPlayer.0.0.0.js</a>, <a href="FlareMediaPlayer.0.0.0.js.html#line373">line 373</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="offset"><span class="type-signature"></span>offset<span class="type-signature"></span></h4>
-
-
-
-
-
-
-
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>offset</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">the offset in ms to start playing from</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="FlareMediaPlayer.0.0.0.js.html">FlareMediaPlayer.0.0.0.js</a>, <a href="FlareMediaPlayer.0.0.0.js.html#line383">line 383</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="source"><span class="type-signature"></span>source<span class="type-signature"></span></h4>
-
-
-
-
-
-
-
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>source</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">buffer</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">this is the buffer source to play from</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="FlareMediaPlayer.0.0.0.js.html">FlareMediaPlayer.0.0.0.js</a>, <a href="FlareMediaPlayer.0.0.0.js.html#line378">line 378</a>
+        <a href="FlareMediaPlayer.0.0.0.js.html">FlareMediaPlayer.0.0.0.js</a>, <a href="FlareMediaPlayer.0.0.0.js.html#line2054">line 2054</a>
     </li></ul></dd>
     
 
@@ -784,7 +454,7 @@
 
 
 <div class="description">
-    Initializes the audio engine
+    Boot function for the clock
 </div>
 
 
@@ -828,7 +498,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="FlareMediaPlayer.0.0.0.js.html">FlareMediaPlayer.0.0.0.js</a>, <a href="FlareMediaPlayer.0.0.0.js.html#line397">line 397</a>
+        <a href="FlareMediaPlayer.0.0.0.js.html">FlareMediaPlayer.0.0.0.js</a>, <a href="FlareMediaPlayer.0.0.0.js.html#line2117">line 2117</a>
     </li></ul></dd>
     
 
@@ -859,145 +529,14 @@
 
     
 
-    <h4 class="name" id="changeVolume"><span class="type-signature"></span>changeVolume<span class="signature">(rangeElement)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="getPauseTime"><span class="type-signature"></span>getPauseTime<span class="signature">()</span><span class="type-signature"> &rarr; {number}</span></h4>
 
     
 
 
 
 <div class="description">
-    Canges the audio volume
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>rangeElement</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">rangeElement</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">range of volume slider</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="FlareMediaPlayer.0.0.0.js.html">FlareMediaPlayer.0.0.0.js</a>, <a href="FlareMediaPlayer.0.0.0.js.html#line495">line 495</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="createNewBufferSource"><span class="type-signature"></span>createNewBufferSource<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-<div class="description">
-    Creates a new buffer source. This needs to be updated because right now its decoding every time before playing
+    Get the last tiem paused
 </div>
 
 
@@ -1041,7 +580,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="FlareMediaPlayer.0.0.0.js.html">FlareMediaPlayer.0.0.0.js</a>, <a href="FlareMediaPlayer.0.0.0.js.html#line409">line 409</a>
+        <a href="FlareMediaPlayer.0.0.0.js.html">FlareMediaPlayer.0.0.0.js</a>, <a href="FlareMediaPlayer.0.0.0.js.html#line2194">line 2194</a>
     </li></ul></dd>
     
 
@@ -1064,6 +603,28 @@
 
 
 
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    time paused
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">number</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -1072,14 +633,14 @@
 
     
 
-    <h4 class="name" id="muteAudio"><span class="type-signature"></span>muteAudio<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="refresh"><span class="type-signature"></span>refresh<span class="signature">()</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    mutes the audio
+    On each refresh, adjust all the time holders
 </div>
 
 
@@ -1123,7 +684,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="FlareMediaPlayer.0.0.0.js.html">FlareMediaPlayer.0.0.0.js</a>, <a href="FlareMediaPlayer.0.0.0.js.html#line476">line 476</a>
+        <a href="FlareMediaPlayer.0.0.0.js.html">FlareMediaPlayer.0.0.0.js</a>, <a href="FlareMediaPlayer.0.0.0.js.html#line2127">line 2127</a>
     </li></ul></dd>
     
 
@@ -1154,14 +715,14 @@
 
     
 
-    <h4 class="name" id="playSound"><span class="type-signature"></span>playSound<span class="signature">(time)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="setPauseTime"><span class="type-signature"></span>setPauseTime<span class="signature">(time)</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Starts the playback at the desired offset in ms
+    Set time paused
 </div>
 
 
@@ -1213,7 +774,7 @@
 
             
 
-            <td class="description last">offset in ms</td>
+            <td class="description last">paused</td>
         </tr>
 
     
@@ -1254,7 +815,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="FlareMediaPlayer.0.0.0.js.html">FlareMediaPlayer.0.0.0.js</a>, <a href="FlareMediaPlayer.0.0.0.js.html#line430">line 430</a>
+        <a href="FlareMediaPlayer.0.0.0.js.html">FlareMediaPlayer.0.0.0.js</a>, <a href="FlareMediaPlayer.0.0.0.js.html#line2204">line 2204</a>
     </li></ul></dd>
     
 
@@ -1285,14 +846,14 @@
 
     
 
-    <h4 class="name" id="stopSound"><span class="type-signature"></span>stopSound<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="totalTimePlayed"><span class="type-signature"></span>totalTimePlayed<span class="signature">(startTime, pauseTime)</span><span class="type-signature"> &rarr; {string}</span></h4>
 
     
 
 
 
 <div class="description">
-    Stops playback
+    Get the total time played
 </div>
 
 
@@ -1301,6 +862,78 @@
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>startTime</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">time Started</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>pauseTime</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">time paused</td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -1336,7 +969,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="FlareMediaPlayer.0.0.0.js.html">FlareMediaPlayer.0.0.0.js</a>, <a href="FlareMediaPlayer.0.0.0.js.html#line448">line 448</a>
+        <a href="FlareMediaPlayer.0.0.0.js.html">FlareMediaPlayer.0.0.0.js</a>, <a href="FlareMediaPlayer.0.0.0.js.html#line2169">line 2169</a>
     </li></ul></dd>
     
 
@@ -1359,6 +992,28 @@
 
 
 
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    formated time string
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -1367,14 +1022,14 @@
 
     
 
-    <h4 class="name" id="toggle"><span class="type-signature"></span>toggle<span class="signature">(time)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="update"><span class="type-signature"></span>update<span class="signature">(time)</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    toggles playback time
+    The function thats called on update
 </div>
 
 
@@ -1426,7 +1081,7 @@
 
             
 
-            <td class="description last">offset to toggle at</td>
+            <td class="description last">time updated</td>
         </tr>
 
     
@@ -1467,7 +1122,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="FlareMediaPlayer.0.0.0.js.html">FlareMediaPlayer.0.0.0.js</a>, <a href="FlareMediaPlayer.0.0.0.js.html#line463">line 463</a>
+        <a href="FlareMediaPlayer.0.0.0.js.html">FlareMediaPlayer.0.0.0.js</a>, <a href="FlareMediaPlayer.0.0.0.js.html#line2145">line 2145</a>
     </li></ul></dd>
     
 
