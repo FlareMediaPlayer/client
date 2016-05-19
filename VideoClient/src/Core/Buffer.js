@@ -1,19 +1,26 @@
-
+/**
+ * class for handling buffering
+ * @author Jens
+ * @memberOf Flare
+ * @class Flare.Buffer
+ * @constructor
+ * @param {MediaPlayer} mediaPlayer a reference to the mediaPlayer
+ */
 Flare.Buffer= function (mediaPlayer) {
 
 
     /**
-    * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
+    * @property {Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.
     */
-   
-    
-   
+
     this.mediaPlayer = mediaPlayer;
     
-    this.testFrame =  null;
-
+    /*
+     * @property {number} channels number of audio channels
+     */
     this.channels = 2 //Stereo for now
 
+    
     this.frame_count = this.mediaPlayer.audioCtx.sampleRate = 2.0;
 
     this.audio_buffer = this.mediaPlayer.audioCtx.createBuffer(this.channels, this.frame_count, this.mediaPlayer.audioCtx.sampleRate);
