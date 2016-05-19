@@ -1,5 +1,8 @@
 Flare.AudioEngine = function(mediaPlayer) {
-
+/******************************
+* Author: Fredrik
+* last edited: May 8th, 2016
+*******************************/
 
     /**
      * @property Flare.VideoPlayer} mediaPlayer - A reference to the mediaPlayer.

@@ -1,20 +1,12 @@
 Flare.Device = function() {
+/******************************
+* Author: Fredrik
+* last edited: May 8th, 2016
+*******************************/
 
+   this.deviceReadyAt = 0;
 
-    /**
-     * The time the device became ready.
-     * @property {integer} deviceReadyAt
-     * @protected
-     */
-    this.deviceReadyAt = 0;
-
-    /**
-     * The time as which initialization has completed.
-     * @property {boolean} initialized
-     * @protected
-     */
     this.initialized = false;
-    /* Make a handler to get DOM info so we can tell if the video is in the view port and stuff like that */
     this.isCompatible = false;
     //  Features
     this.hasGeneralInputTypes = false;
@@ -22,7 +14,6 @@ Flare.Device = function() {
     this.hasWebGL = false;
     this.hasFile = false;
     this.hasLocalStorage = false;
-    //this.hasCss3D = false;
     this.hasTypedArray = false;
     //  Input
     this.hasTouch = false;
