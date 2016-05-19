@@ -530,8 +530,8 @@ Flare.VideoPlayer.prototype = {
 
     },
     /**
-     * Bind callback for video player doubleclick. To go into full screen mode.
-     * @function playerFullScreen
+     * Bind callback for video player doubleclick. 
+     * @function playerFullScreen to go into full screen mode.
      * @param {object} e the mouse event
      */
     playerFullScreen: function(e) {
