@@ -1,6 +1,6 @@
 /**
  * class for handling the canvas element
- * @author Fredrik Sigvartsen and Brian Parra and Jens Omfjord
+ * @author Fredrik Sigvartsen and Brian Parra and Jens Omfjord and Ankit Kapoor
  * @memberOf Flare
  * @class Flare.VideoPlayer
  * @constructor
@@ -351,7 +351,7 @@ Flare.VideoPlayer.prototype = {
         this.progressBar.ondrag = this.handleDrag.bind(this);
         this.progressBar.ondragend = this.handleDragEnd.bind(this);
         this.playButton.onclick = this.handlePlayButtonPress.bind(this);
-
+        this.videoPlayer.ondblclick = this.playerFullScreen.bind(this);
 
         this.videoPlayer.appendChild(this.controlBar);
         this.videoPlayer.appendChild(this.loadingBar);
@@ -529,6 +529,24 @@ Flare.VideoPlayer.prototype = {
         }
 
     },
+    /**
+     * Bind callback for video player doubleclick. To go into full screen mode.
+     * @function playerFullScreen
+     * @param {object} e the mouse event
+     */
+    playerFullScreen: function(e) {
+		
+		if (this.videoPlayer.requestFullscreen) {
+		  this.videoPlayer.requestFullscreen();
+		} else if (this.videoPlayer.msRequestFullscreen) {
+		  this.videoPlayer.msRequestFullscreen();
+		} else if (this.videoPlayer.mozRequestFullScreen) {
+		  this.videoPlayer.mozRequestFullScreen();
+		} else if (this.videoPlayer.webkitRequestFullscreen) {
+		  this.videoPlayer.webkitRequestFullscreen();
+		}
+	
+	},
     /**
      * Updates the numerical time display in formated min/sec
      * @memberof Flare.VideoPlayer.prototype
